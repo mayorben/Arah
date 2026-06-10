@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arah Provisions — Storefront Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Josefin+Sans:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green:  #1B4332;
+    --green2: #145129;
+    --cream:  #F8F6F0;
+    --gold:   #C9A84C;
+    --ink:    #1A1A1A;
+    --muted:  #6B7280;
+    --border: #E5E0D5;
+    --white:  #ffffff;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
+
+  /* ─── NAV ─── */
+  nav {
+    background: var(--green);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: white; letter-spacing: .04em; }
+  .brand-sub  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); }
+  .nav-right  { display: flex; align-items: center; gap: 24px; }
+  .cart-wrap  { position: relative; cursor: pointer; }
+  .cart-icon  { width: 22px; height: 22px; color: white; }
+  .cart-badge { position: absolute; top: -8px; right: -8px; background: #FBBF24; color: #000; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .nav-link   { font-family: 'Josefin Sans', sans-serif; color: rgba(255,255,255,.6); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+
+  /* ─── SPLIT HERO ─── */
+  .hero { display: flex; min-height: 580px; }
+
+  .hero-left {
+    flex: 0 0 46%;
+    background: var(--green);
+    padding: 72px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: 0; bottom: 0;
+    width: 80px;
+    background: var(--green);
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    z-index: 2;
+  }
+
+  .hero-label { font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-weight: 600; }
+  .hero-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 500; line-height: 1.08; margin-bottom: 18px; color: white; letter-spacing: -.01em; }
+  .hero-left p  { color: rgba(255,255,255,.7); font-size: 15px; max-width: 380px; line-height: 1.72; font-weight: 300; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 34px; padding: 14px 28px;
+    background: var(--gold); color: var(--ink);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    border-radius: 2px; cursor: pointer;
+    text-decoration: none; width: fit-content;
+    transition: background .15s;
+  }
+  .hero-cta:hover { background: #b8973d; }
+
+  /* ─── HERO CAROUSEL ─── */
+  .hero-right {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #0d2b1e;
+  }
+
+  .carousel-slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .carousel-slide.active { opacity: 1; }
+  .carousel-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .carousel-slide::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(27,67,50,.3) 0%, transparent 60%);
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 28px; left: 48px; z-index: 3;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .6s .3s ease, transform .6s .3s ease;
+  }
+  .carousel-slide.active .slide-caption { opacity: 1; transform: translateY(0); }
+  .slide-caption span {
+    font-family: 'Josefin Sans', sans-serif;
+    background: rgba(27,67,50,.75);
+    backdrop-filter: blur(6px);
+    color: rgba(255,255,255,.9);
+    font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; font-weight: 600;
+    padding: 6px 14px; border-radius: 2px;
+    border-left: 2px solid var(--gold);
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 20px; right: 24px; z-index: 4;
+    display: flex; gap: 6px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,.4);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+    border: none; padding: 0;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.2); }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    z-index: 4;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,.2);
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background .2s;
+  }
+  .carousel-arrow:hover { background: rgba(255,255,255,.25); }
+  .carousel-arrow.prev { left: 16px; }
+  .carousel-arrow.next { right: 16px; }
+
+  .stripe { height: 4px; background: var(--gold); }
+
+  /* ─── IMAGE GRID ─── */
+  .image-grid-section { max-width: 1100px; margin: 0 auto; padding: 52px 40px 0; }
+  .section-eyebrow { font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; font-weight: 600; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 500; color: var(--green); margin-bottom: 24px; letter-spacing: -.01em; }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 220px 220px;
+    gap: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .grid-img { position: relative; overflow: hidden; background: var(--cream); }
+  .grid-img:first-child { grid-row: 1 / 3; }
+  .grid-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+  .grid-img:hover img { transform: scale(1.05); }
+  .grid-img-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(27,67,50,.78));
+    color: white; font-size: 11px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 32px 14px 12px;
+    opacity: 0; transition: opacity .3s;
+  }
+  .grid-img:hover .grid-img-label { opacity: 1; }
+
+  /* ─── PRODUCTS ─── */
+  .products-section { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
+  .section-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+  .filter-pill {
+    font-family: 'Josefin Sans', sans-serif;
+    padding: 6px 18px; font-size: 10px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    border-radius: 999px; border: 1.5px solid var(--gold);
+    color: var(--green); cursor: pointer; background: transparent;
+    transition: all .2s;
+  }
+  .filter-pill.active { background: var(--green); color: white; border-color: var(--green); }
+
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  .card {
+    background: white; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    transition: box-shadow .2s, transform .15s;
+  }
+  .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+  .card-img {
+    height: 200px; position: relative; overflow: hidden;
+    background: var(--cream);
+  }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+  .card:hover .card-img img { transform: scale(1.05); }
+  .card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%); }
+  .card-badge {
+    font-family: 'Josefin Sans', sans-serif;
+    position: absolute; top: 12px; left: 12px;
+    background: var(--green); color: white;
+    font-size: 8px; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 2px; z-index: 1;
+  }
+
+  .card-body { padding: 18px 20px 20px; }
+  .card-cat  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; margin-bottom: 6px; color: var(--ink); line-height: 1.2; letter-spacing: .01em; }
+  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; min-height: 36px; font-weight: 300; }
+
+  .card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .card-price  { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 20px; color: var(--green); letter-spacing: .01em; }
+  .card-unit   { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-left: 4px; font-weight: 300; }
+  .add-btn {
+    font-family: 'Josefin Sans', sans-serif;
+    padding: 8px 18px; background: var(--green); color: white;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    border-radius: 2px; border: none; cursor: pointer;
+    transition: background .15s;
+  }
+  .add-btn:hover { background: var(--green2); }
+  .qty-control { display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 16px; font-weight: 600; border: 1.5px solid var(--green);
+    background: transparent; color: var(--green); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .qty-btn.plus { background: var(--green); color: white; border-color: var(--green); }
+  .qty-num { font-weight: 600; font-size: 14px; min-width: 16px; text-align: center; }
+
+  /* ─── WHATSAPP BUTTON ─── */
+  .wa-float {
+    position: fixed; bottom: 32px; left: 32px;
+    background: #25D366; color: white;
+    padding: 14px 22px; border-radius: 999px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    box-shadow: 0 8px 28px rgba(37,211,102,.4);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; z-index: 100; text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .wa-float:hover { transform: scale(1.04); box-shadow: 0 12px 32px rgba(37,211,102,.5); }
+  .wa-float svg { flex-shrink: 0; }
+
+  .hero-ctas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 34px; }
+  .hero-wa {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 22px;
+    background: transparent; color: white;
+    border: 1.5px solid rgba(255,255,255,.35);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    border-radius: 2px; cursor: pointer; text-decoration: none;
+    transition: background .15s, border-color .15s;
+  }
+  .hero-wa:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.6); }
+
+  /* ─── FLOAT CART ─── */
+  .float-cart {
+    font-family: 'Josefin Sans', sans-serif;
+    position: fixed; bottom: 32px; right: 32px;
+    background: var(--green); color: white;
+    padding: 16px 26px; border-radius: 999px;
+    font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    box-shadow: 0 8px 28px rgba(27,67,50,.45);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; z-index: 100; transition: transform .15s;
+  }
+  .float-cart:hover { transform: scale(1.03); }
+
+  /* ─── FOOTER ─── */
+  footer { background: var(--green); color: white; text-align: center; padding: 40px 24px; }
+  footer .f-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; margin-bottom: 8px; letter-spacing: .04em; }
+  footer .f-tag  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+
+  .preview-note {
+    background: #FEF3C7; border-bottom: 2px solid #F59E0B;
+    padding: 10px 20px; font-size: 12px; font-weight: 600;
+    color: #92400E; text-align: center; letter-spacing: .05em;
+  }
+
+  /* ─── TABLET ─── */
+  @media (max-width: 900px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .image-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 200px 160px 160px;
+    }
+    .grid-img:first-child { grid-row: auto; grid-column: 1 / 3; }
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 640px) {
+    nav { padding: 14px 20px; }
+    .brand-name { font-size: 22px; }
+
+    /* Full-bleed hero: carousel fills entire area, text overlaid at bottom */
+    .hero {
+      flex-direction: column;
+      min-height: 92vh;
+      position: relative;
+    }
+    .hero-left {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      width: 100%;
+      /* Dark green fades in from bottom — text sits on top of it */
+      background: linear-gradient(
+        to top,
+        rgba(27,67,50,.97) 0%,
+        rgba(27,67,50,.82) 38%,
+        rgba(27,67,50,.4)  62%,
+        transparent        100%
+      );
+      padding: 0 24px 44px;
+      justify-content: flex-end;
+    }
+    /* Remove the desktop diagonal wedge — breaks on mobile */
+    .hero-left::after { display: none; }
+    .hero-left h1  { font-size: 42px; }
+    .hero-left p   { max-width: 100%; font-size: 14px; }
+    .hero-cta      { margin-top: 24px; }
+
+    /* Carousel fills full hero as background */
+    .hero-right {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .carousel-arrow.prev { left: 10px; }
+    .carousel-arrow.next { right: 10px; }
+    .carousel-dots { bottom: 52px; right: 20px; }
+    .slide-caption { left: 24px; bottom: 52px; }
+
+    /* Image grid: big image top, 2-col below */
+    .image-grid-section { padding: 36px 16px 0; }
+    .section-title { font-size: 28px; }
+    .image-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 180px 130px 130px;
+    }
+    .grid-img:first-child { grid-row: auto; grid-column: 1 / 3; }
+
+    /* Products: 2 columns, tighter padding */
+    .products-section { padding: 36px 16px 80px; }
+    .section-filters { gap: 8px; }
+    .filter-pill { padding: 5px 14px; font-size: 10px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .card-img { height: 150px; }
+    .card-body { padding: 14px 14px 16px; }
+    .card-name { font-size: 14px; }
+    .card-desc { font-size: 11.5px; min-height: 0; margin-bottom: 12px; }
+    .card-price { font-size: 15px; }
+    .add-btn { padding: 7px 12px; font-size: 11px; }
+    .qty-btn { width: 24px; height: 24px; font-size: 14px; }
+
+    /* Float buttons */
+    .wa-float   { padding: 12px 18px; font-size: 10px; bottom: 20px; left: 12px; }
+    .float-cart { padding: 14px; bottom: 20px; right: 12px; gap: 0; border-radius: 50%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-note">⚡ STOREFRONT PREVIEW — Static demo with sample data</div>
+
+<!-- NAV -->
+<nav>
+  <div class="brand">
+    <span class="brand-name">Arah</span>
+    <span class="brand-sub">Provisions</span>
+  </div>
+  <div class="nav-right">
+    <div class="cart-wrap">
+      <svg class="cart-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13H5.4M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+      </svg>
+      <span class="cart-badge">2</span>
+    </div>
+    <a class="nav-link">Admin</a>
+  </div>
+</nav>
+
+<!-- SPLIT HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <p class="hero-label">Premium Quality</p>
+    <h1>The finest provisions,<br>delivered to your door.</h1>
+    <p>Rice, beans, palm oil and everything your kitchen needs — sourced with care, packed with pride.</p>
+    <div class="hero-ctas">
+      <a class="hero-cta" href="#products">
+        Shop Now
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a class="hero-wa" href="https://wa.me/2348012345678?text=Hi!%20I%20want%20to%20place%20an%20order." target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Order on WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <!-- Slide 1: rice/grains harvest -->
+    <div class="carousel-slide active">
+      <img
+        src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/grain1/1000/600'"
+        alt="Grains" loading="eager" />
+      <div class="slide-caption"><span>Premium Grains</span></div>
+    </div>
+    <!-- Slide 2: vibrant food market -->
+    <div class="carousel-slide">
+      <img
+        src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/market2/1000/600'"
+        alt="Market" loading="lazy" />
+      <div class="slide-caption"><span>Fresh from Source</span></div>
+    </div>
+    <!-- Slide 3: colourful food flat-lay -->
+    <div class="carousel-slide">
+      <img
+        src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/food3/1000/600'"
+        alt="Food" loading="lazy" />
+      <div class="slide-caption"><span>Oils &amp; Seasonings</span></div>
+    </div>
+    <!-- Slide 4: produce / vegetables -->
+    <div class="carousel-slide">
+      <img
+        src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/produce4/1000/600'"
+        alt="Produce" loading="lazy" />
+      <div class="slide-caption"><span>Legumes &amp; More</span></div>
+    </div>
+
+    <button class="carousel-arrow prev" onclick="carouselStep(-1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="carousel-arrow next" onclick="carouselStep(1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+    <div class="carousel-dots">
+      <button class="dot active" onclick="goToSlide(0)"></button>
+      <button class="dot" onclick="goToSlide(1)"></button>
+      <button class="dot" onclick="goToSlide(2)"></button>
+      <button class="dot" onclick="goToSlide(3)"></button>
+    </div>
+  </div>
+</div>
+<div class="stripe"></div>
+
+<!-- IMAGE GRID -->
+<div class="image-grid-section">
+  <p class="section-eyebrow">Sourced with care</p>
+  <h2 class="section-title">Our Provisions</h2>
+  <div class="image-grid">
+    <!-- large feature: rice sack -->
+    <div class="grid-img">
+      <img
+        src="https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=900&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/ricebig/900/700'"
+        alt="Rice">
+      <div class="grid-img-label">Premium Rice</div>
+    </div>
+    <!-- palm oil amber -->
+    <div class="grid-img">
+      <img
+        src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/palmoil/500/320'"
+        alt="Palm Oil">
+      <div class="grid-img-label">Palm Oil</div>
+    </div>
+    <!-- beans bowl -->
+    <div class="grid-img">
+      <img
+        src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/beansbowl/500/320'"
+        alt="Beans">
+      <div class="grid-img-label">Beans</div>
+    </div>
+    <!-- spices/seasoning -->
+    <div class="grid-img">
+      <img
+        src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/crayfish/500/320'"
+        alt="Crayfish">
+      <div class="grid-img-label">Crayfish</div>
+    </div>
+    <!-- flour/cassava -->
+    <div class="grid-img">
+      <img
+        src="https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/garrisw/500/320'"
+        alt="Garri">
+      <div class="grid-img-label">Garri &amp; Swallow</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-section" id="products">
+  <div class="section-filters">
+    <button class="filter-pill active">All</button>
+    <button class="filter-pill">Grains</button>
+    <button class="filter-pill">Legumes</button>
+    <button class="filter-pill">Oils &amp; Fats</button>
+    <button class="filter-pill">Swallow</button>
+    <button class="filter-pill">Seasonings</button>
+  </div>
+
+  <div class="product-grid">
+
+    <!-- Card 1 — Ofada Rice (featured, qty) -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/ofadarice/600/400'"
+          alt="Ofada Rice" />
+        <div class="card-img-overlay"></div>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Grains</p>
+        <h3 class="card-name">Ofada Rice</h3>
+        <p class="card-desc">Locally grown, richly aromatic. The rice that makes the stew worth it.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦4,500</span><span class="card-unit">/ 5kg bag</span></div>
+          <div class="qty-control">
+            <button class="qty-btn">−</button>
+            <span class="qty-num">2</span>
+            <button class="qty-btn plus">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 — Long Grain Rice -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/longgrain/600/400'"
+          alt="Long Grain Rice" />
+        <div class="card-img-overlay"></div>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Grains</p>
+        <h3 class="card-name">Long Grain Rice</h3>
+        <p class="card-desc">Clean, fluffy grains for everyday family meals.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦28,000</span><span class="card-unit">/ 25kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 — Palm Oil (featured) -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/palmoilcard/600/400'"
+          alt="Palm Oil" />
+        <div class="card-img-overlay"></div>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Oils &amp; Fats</p>
+        <h3 class="card-name">Palm Oil</h3>
+        <p class="card-desc">Deep red, rich in flavour. The foundation of Nigerian cuisine.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦6,500</span><span class="card-unit">/ 5L bottle</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 — Oloyin Beans (featured) -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/oloyinbeans/600/400'"
+          alt="Oloyin Beans" />
+        <div class="card-img-overlay"></div>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Legumes</p>
+        <h3 class="card-name">Oloyin Beans</h3>
+        <p class="card-desc">Honey beans — sweet, creamy, and full of goodness.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦5,200</span><span class="card-unit">/ 5kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 — Garri -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/garriwhite/600/400'"
+          alt="Garri" />
+        <div class="card-img-overlay"></div>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Swallow</p>
+        <h3 class="card-name">Garri (White)</h3>
+        <p class="card-desc">Freshly processed, fine-grade. Eat as eba or soak — no wrong answer.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦4,200</span><span class="card-unit">/ 10kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 — Crayfish -->
+    <div class="card">
+      <div class="card-img">
+        <img
+          src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/crayfishcard/600/400'"
+          alt="Crayfish" />
+        <div class="card-img-overlay"></div>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Seasonings</p>
+        <h3 class="card-name">Crayfish</h3>
+        <p class="card-desc">Smoky, pungent, irreplaceable. The soul of every great Nigerian soup.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦1,500</span><span class="card-unit">/ 500g pack</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- WHATSAPP FLOAT -->
+<a class="wa-float" href="https://wa.me/2348012345678?text=Hi!%20I%20want%20to%20place%20an%20order." target="_blank" rel="noopener">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+  Order on WhatsApp
+</a>
+<div class="float-cart">
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13H5.4M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+  </svg>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p class="f-name">Arah Provisions</p>
+  <p class="f-tag">Premium Quality · Honest Prices</p>
+</footer>
+
+<script>
+  // ── Carousel ──
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots   = document.querySelectorAll('.dot');
+  let current  = 0;
+  let timer;
+
+  function goToSlide(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    resetTimer();
+  }
+  function carouselStep(dir) { goToSlide(current + dir); }
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => goToSlide(current + 1), 4500);
+  }
+  resetTimer();
+
+  // ── Filter pills ──
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
