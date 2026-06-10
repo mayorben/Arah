@@ -42,15 +42,12 @@
   .nav-link   { color: rgba(255,255,255,.6); font-size: 13px; text-decoration: none; cursor: pointer; }
 
   /* ─── SPLIT HERO ─── */
-  .hero {
-    display: flex;
-    min-height: 580px;
-  }
+  .hero { display: flex; min-height: 580px; }
 
   .hero-left {
     flex: 0 0 46%;
     background: var(--green);
-    padding: 72px 60px 72px 60px;
+    padding: 72px 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -90,21 +87,18 @@
   }
 
   .carousel-slide {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     opacity: 0;
     transition: opacity 1s ease;
   }
   .carousel-slide.active { opacity: 1; }
   .carousel-slide img {
     width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
+    object-fit: cover; display: block;
   }
   .carousel-slide::after {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(135deg, rgba(27,67,50,.3) 0%, transparent 60%);
   }
 
@@ -115,19 +109,14 @@
     transform: translateY(8px);
     transition: opacity .6s .3s ease, transform .6s .3s ease;
   }
-  .carousel-slide.active .slide-caption {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .carousel-slide.active .slide-caption { opacity: 1; transform: translateY(0); }
   .slide-caption span {
     background: rgba(27,67,50,.75);
     backdrop-filter: blur(6px);
     color: rgba(255,255,255,.9);
-    font-size: 11px;
-    letter-spacing: .14em;
+    font-size: 11px; letter-spacing: .14em;
     text-transform: uppercase;
-    padding: 6px 14px;
-    border-radius: 2px;
+    padding: 6px 14px; border-radius: 2px;
     border-left: 2px solid var(--gold);
   }
 
@@ -156,8 +145,7 @@
     width: 38px; height: 38px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: background .2s;
+    cursor: pointer; transition: background .2s;
   }
   .carousel-arrow:hover { background: rgba(255,255,255,.25); }
   .carousel-arrow.prev { left: 16px; }
@@ -165,27 +153,11 @@
 
   .stripe { height: 4px; background: var(--gold); }
 
-  /* ─── FEATURED IMAGE GRID ─── */
-  .image-grid-section {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 52px 40px 0;
-  }
-  .section-eyebrow {
-    font-size: 10px;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--green);
-    margin-bottom: 24px;
-  }
+  /* ─── IMAGE GRID ─── */
+  .image-grid-section { max-width: 1100px; margin: 0 auto; padding: 52px 40px 0; }
+  .section-eyebrow { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; font-weight: 600; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green); margin-bottom: 24px; }
+
   .image-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -194,38 +166,23 @@
     border-radius: 12px;
     overflow: hidden;
   }
-  .grid-img {
-    position: relative;
-    overflow: hidden;
-  }
-  .grid-img:first-child {
-    grid-row: 1 / 3;
-  }
-  .grid-img img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform .4s ease;
-  }
+  .grid-img { position: relative; overflow: hidden; background: var(--cream); }
+  .grid-img:first-child { grid-row: 1 / 3; }
+  .grid-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
   .grid-img:hover img { transform: scale(1.05); }
   .grid-img-label {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
+    position: absolute; bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, rgba(27,67,50,.78));
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .1em;
-    text-transform: uppercase;
+    color: white; font-size: 11px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
     padding: 32px 14px 12px;
-    opacity: 0;
-    transition: opacity .3s;
+    opacity: 0; transition: opacity .3s;
   }
   .grid-img:hover .grid-img-label { opacity: 1; }
 
-  /* ─── PRODUCTS SECTION ─── */
+  /* ─── PRODUCTS ─── */
   .products-section { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
-  .section-filters   { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+  .section-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
   .filter-pill {
     padding: 6px 18px; font-size: 11px; font-weight: 600;
     letter-spacing: .1em; text-transform: uppercase;
@@ -246,29 +203,17 @@
   .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
 
   .card-img {
-    height: 200px;
-    position: relative;
-    overflow: hidden;
+    height: 200px; position: relative; overflow: hidden;
     background: var(--cream);
   }
-  .card-img img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform .4s ease;
-  }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
   .card:hover .card-img img { transform: scale(1.05); }
-  .card-img-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%);
-  }
+  .card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%); }
   .card-badge {
     position: absolute; top: 12px; left: 12px;
     background: var(--green); color: white;
     font-size: 9px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
-    z-index: 1;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 3px; z-index: 1;
   }
 
   .card-body { padding: 18px 20px 20px; }
@@ -296,7 +241,7 @@
   .qty-btn.plus { background: var(--green); color: white; border-color: var(--green); }
   .qty-num { font-weight: 600; font-size: 14px; min-width: 16px; text-align: center; }
 
-  /* ─── FLOATING CART ─── */
+  /* ─── FLOAT CART ─── */
   .float-cart {
     position: fixed; bottom: 32px; right: 32px;
     background: var(--green); color: white;
@@ -304,20 +249,15 @@
     font-weight: 600; font-size: 14px;
     box-shadow: 0 8px 28px rgba(27,67,50,.45);
     display: flex; align-items: center; gap: 10px;
-    cursor: pointer; z-index: 100;
-    transition: transform .15s;
+    cursor: pointer; z-index: 100; transition: transform .15s;
   }
   .float-cart:hover { transform: scale(1.03); }
 
   /* ─── FOOTER ─── */
-  footer {
-    background: var(--green); color: white;
-    text-align: center; padding: 40px 24px;
-  }
+  footer { background: var(--green); color: white; text-align: center; padding: 40px 24px; }
   footer .f-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
   footer .f-tag  { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
 
-  /* ─── PREVIEW LABEL ─── */
   .preview-note {
     background: #FEF3C7; border-bottom: 2px solid #F59E0B;
     padding: 10px 20px; font-size: 12px; font-weight: 600;
@@ -348,7 +288,6 @@
 
 <!-- SPLIT HERO -->
 <div class="hero">
-  <!-- Left: text -->
   <div class="hero-left">
     <p class="hero-label">Premium Quality</p>
     <h1>The finest provisions,<br>delivered to your door.</h1>
@@ -361,22 +300,37 @@
     </a>
   </div>
 
-  <!-- Right: image carousel -->
   <div class="hero-right">
+    <!-- Slide 1: rice/grains harvest -->
     <div class="carousel-slide active">
-      <img src="https://source.unsplash.com/1000x700/?rice,grain,harvest&sig=101" alt="Grains" loading="eager" />
+      <img
+        src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/grain1/1000/600'"
+        alt="Grains" loading="eager" />
       <div class="slide-caption"><span>Premium Grains</span></div>
     </div>
+    <!-- Slide 2: vibrant food market -->
     <div class="carousel-slide">
-      <img src="https://source.unsplash.com/1000x700/?african+food,market,produce&sig=102" alt="Market" loading="lazy" />
+      <img
+        src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/market2/1000/600'"
+        alt="Market" loading="lazy" />
       <div class="slide-caption"><span>Fresh from Source</span></div>
     </div>
+    <!-- Slide 3: colourful food flat-lay -->
     <div class="carousel-slide">
-      <img src="https://source.unsplash.com/1000x700/?cooking+oil,spices,kitchen&sig=103" alt="Oils" loading="lazy" />
+      <img
+        src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/food3/1000/600'"
+        alt="Food" loading="lazy" />
       <div class="slide-caption"><span>Oils &amp; Seasonings</span></div>
     </div>
+    <!-- Slide 4: produce / vegetables -->
     <div class="carousel-slide">
-      <img src="https://source.unsplash.com/1000x700/?beans,legumes,natural+food&sig=104" alt="Legumes" loading="lazy" />
+      <img
+        src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1000&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/produce4/1000/600'"
+        alt="Produce" loading="lazy" />
       <div class="slide-caption"><span>Legumes &amp; More</span></div>
     </div>
 
@@ -390,7 +344,6 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
       </svg>
     </button>
-
     <div class="carousel-dots">
       <button class="dot active" onclick="goToSlide(0)"></button>
       <button class="dot" onclick="goToSlide(1)"></button>
@@ -401,29 +354,49 @@
 </div>
 <div class="stripe"></div>
 
-<!-- IMAGE GRID — Our Provisions -->
+<!-- IMAGE GRID -->
 <div class="image-grid-section">
   <p class="section-eyebrow">Sourced with care</p>
   <h2 class="section-title">Our Provisions</h2>
   <div class="image-grid">
+    <!-- large feature: rice sack -->
     <div class="grid-img">
-      <img src="https://source.unsplash.com/900x700/?rice,grain,sack,harvest&sig=201" alt="Rice">
+      <img
+        src="https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=900&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/ricebig/900/700'"
+        alt="Rice">
       <div class="grid-img-label">Premium Rice</div>
     </div>
+    <!-- palm oil amber -->
     <div class="grid-img">
-      <img src="https://source.unsplash.com/500x320/?cooking+oil,amber,bottle&sig=202" alt="Palm Oil">
+      <img
+        src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/palmoil/500/320'"
+        alt="Palm Oil">
       <div class="grid-img-label">Palm Oil</div>
     </div>
+    <!-- beans bowl -->
     <div class="grid-img">
-      <img src="https://source.unsplash.com/500x320/?beans,legumes,bowl&sig=203" alt="Beans">
+      <img
+        src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/beansbowl/500/320'"
+        alt="Beans">
       <div class="grid-img-label">Beans</div>
     </div>
+    <!-- spices/seasoning -->
     <div class="grid-img">
-      <img src="https://source.unsplash.com/500x320/?dried+fish,seafood,spice&sig=204" alt="Crayfish">
+      <img
+        src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/crayfish/500/320'"
+        alt="Crayfish">
       <div class="grid-img-label">Crayfish</div>
     </div>
+    <!-- flour/cassava -->
     <div class="grid-img">
-      <img src="https://source.unsplash.com/500x320/?flour,powder,starch,grain&sig=205" alt="Garri">
+      <img
+        src="https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=500&q=80"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/garrisw/500/320'"
+        alt="Garri">
       <div class="grid-img-label">Garri &amp; Swallow</div>
     </div>
   </div>
@@ -442,10 +415,13 @@
 
   <div class="product-grid">
 
-    <!-- Card 1 — Featured, qty control -->
+    <!-- Card 1 — Ofada Rice (featured, qty) -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?brown+rice,unpolished+rice,grain&sig=1" alt="Ofada Rice" />
+        <img
+          src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/ofadarice/600/400'"
+          alt="Ofada Rice" />
         <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
@@ -464,10 +440,13 @@
       </div>
     </div>
 
-    <!-- Card 2 -->
+    <!-- Card 2 — Long Grain Rice -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?white+rice,cooked+rice,fluffy&sig=2" alt="Long Grain Rice" />
+        <img
+          src="https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/longgrain/600/400'"
+          alt="Long Grain Rice" />
         <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
@@ -481,10 +460,13 @@
       </div>
     </div>
 
-    <!-- Card 3 — Featured -->
+    <!-- Card 3 — Palm Oil (featured) -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?cooking+oil,red+oil,palm&sig=3" alt="Palm Oil" />
+        <img
+          src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/palmoilcard/600/400'"
+          alt="Palm Oil" />
         <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
@@ -499,10 +481,13 @@
       </div>
     </div>
 
-    <!-- Card 4 — Featured -->
+    <!-- Card 4 — Oloyin Beans (featured) -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?beans,brown+beans,legume&sig=4" alt="Oloyin Beans" />
+        <img
+          src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/oloyinbeans/600/400'"
+          alt="Oloyin Beans" />
         <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
@@ -517,10 +502,13 @@
       </div>
     </div>
 
-    <!-- Card 5 -->
+    <!-- Card 5 — Garri -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?cassava,tapioca,flour,starch&sig=5" alt="Garri" />
+        <img
+          src="https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/garriwhite/600/400'"
+          alt="Garri" />
         <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
@@ -534,10 +522,13 @@
       </div>
     </div>
 
-    <!-- Card 6 -->
+    <!-- Card 6 — Crayfish -->
     <div class="card">
       <div class="card-img">
-        <img src="https://source.unsplash.com/600x400/?dried+shrimp,seafood,spice,seasoning&sig=6" alt="Crayfish" />
+        <img
+          src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=600&q=80"
+          onerror="this.onerror=null;this.src='https://picsum.photos/seed/crayfishcard/600/400'"
+          alt="Crayfish" />
         <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
@@ -583,14 +574,11 @@
     dots[current].classList.add('active');
     resetTimer();
   }
-
   function carouselStep(dir) { goToSlide(current + dir); }
-
   function resetTimer() {
     clearInterval(timer);
     timer = setInterval(() => goToSlide(current + 1), 4500);
   }
-
   resetTimer();
 
   // ── Filter pills ──
