@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arah Provisions — Storefront Preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Josefin+Sans:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,7 +21,7 @@
     --white:  #ffffff;
   }
 
-  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
 
   /* ─── NAV ─── */
   nav {
@@ -33,13 +34,13 @@
     box-shadow: 0 2px 12px rgba(0,0,0,.25);
   }
   .brand { display: flex; align-items: baseline; gap: 10px; }
-  .brand-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: white; }
-  .brand-sub  { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: white; letter-spacing: .04em; }
+  .brand-sub  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); }
   .nav-right  { display: flex; align-items: center; gap: 24px; }
   .cart-wrap  { position: relative; cursor: pointer; }
   .cart-icon  { width: 22px; height: 22px; color: white; }
   .cart-badge { position: absolute; top: -8px; right: -8px; background: #FBBF24; color: #000; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .nav-link   { color: rgba(255,255,255,.6); font-size: 13px; text-decoration: none; cursor: pointer; }
+  .nav-link   { font-family: 'Josefin Sans', sans-serif; color: rgba(255,255,255,.6); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
 
   /* ─── SPLIT HERO ─── */
   .hero { display: flex; min-height: 580px; }
@@ -64,14 +65,15 @@
     z-index: 2;
   }
 
-  .hero-label { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
-  .hero-left h1 { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; line-height: 1.15; margin-bottom: 18px; color: white; }
-  .hero-left p  { color: rgba(255,255,255,.7); font-size: 15px; max-width: 380px; line-height: 1.7; }
+  .hero-label { font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-weight: 600; }
+  .hero-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 500; line-height: 1.08; margin-bottom: 18px; color: white; letter-spacing: -.01em; }
+  .hero-left p  { color: rgba(255,255,255,.7); font-size: 15px; max-width: 380px; line-height: 1.72; font-weight: 300; }
   .hero-cta {
     display: inline-flex; align-items: center; gap: 8px;
     margin-top: 34px; padding: 14px 28px;
     background: var(--gold); color: var(--ink);
-    font-size: 13px; font-weight: 600;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
     border-radius: 2px; cursor: pointer;
     text-decoration: none; width: fit-content;
     transition: background .15s;
@@ -111,11 +113,12 @@
   }
   .carousel-slide.active .slide-caption { opacity: 1; transform: translateY(0); }
   .slide-caption span {
+    font-family: 'Josefin Sans', sans-serif;
     background: rgba(27,67,50,.75);
     backdrop-filter: blur(6px);
     color: rgba(255,255,255,.9);
-    font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase;
+    font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; font-weight: 600;
     padding: 6px 14px; border-radius: 2px;
     border-left: 2px solid var(--gold);
   }
@@ -155,8 +158,8 @@
 
   /* ─── IMAGE GRID ─── */
   .image-grid-section { max-width: 1100px; margin: 0 auto; padding: 52px 40px 0; }
-  .section-eyebrow { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; font-weight: 600; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green); margin-bottom: 24px; }
+  .section-eyebrow { font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; font-weight: 600; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 500; color: var(--green); margin-bottom: 24px; letter-spacing: -.01em; }
 
   .image-grid {
     display: grid;
@@ -184,8 +187,9 @@
   .products-section { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
   .section-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
   .filter-pill {
-    padding: 6px 18px; font-size: 11px; font-weight: 600;
-    letter-spacing: .1em; text-transform: uppercase;
+    font-family: 'Josefin Sans', sans-serif;
+    padding: 6px 18px; font-size: 10px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
     border-radius: 999px; border: 1.5px solid var(--gold);
     color: var(--green); cursor: pointer; background: transparent;
     transition: all .2s;
@@ -210,23 +214,26 @@
   .card:hover .card-img img { transform: scale(1.05); }
   .card-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%); }
   .card-badge {
+    font-family: 'Josefin Sans', sans-serif;
     position: absolute; top: 12px; left: 12px;
     background: var(--green); color: white;
-    font-size: 9px; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; padding: 4px 10px; border-radius: 3px; z-index: 1;
+    font-size: 8px; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 2px; z-index: 1;
   }
 
   .card-body { padding: 18px 20px 20px; }
-  .card-cat  { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-  .card-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
-  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-bottom: 16px; min-height: 36px; }
+  .card-cat  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; margin-bottom: 6px; color: var(--ink); line-height: 1.2; letter-spacing: .01em; }
+  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; min-height: 36px; font-weight: 300; }
 
   .card-footer { display: flex; align-items: center; justify-content: space-between; }
-  .card-price  { font-weight: 700; font-size: 17px; color: var(--green); }
-  .card-unit   { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .card-price  { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 20px; color: var(--green); letter-spacing: .01em; }
+  .card-unit   { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-left: 4px; font-weight: 300; }
   .add-btn {
+    font-family: 'Josefin Sans', sans-serif;
     padding: 8px 18px; background: var(--green); color: white;
-    font-size: 12px; font-weight: 600; border-radius: 2px; border: none; cursor: pointer;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    border-radius: 2px; border: none; cursor: pointer;
     transition: background .15s;
   }
   .add-btn:hover { background: var(--green2); }
@@ -243,10 +250,11 @@
 
   /* ─── FLOAT CART ─── */
   .float-cart {
+    font-family: 'Josefin Sans', sans-serif;
     position: fixed; bottom: 32px; right: 32px;
     background: var(--green); color: white;
     padding: 16px 26px; border-radius: 999px;
-    font-weight: 600; font-size: 14px;
+    font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
     box-shadow: 0 8px 28px rgba(27,67,50,.45);
     display: flex; align-items: center; gap: 10px;
     cursor: pointer; z-index: 100; transition: transform .15s;
@@ -255,8 +263,8 @@
 
   /* ─── FOOTER ─── */
   footer { background: var(--green); color: white; text-align: center; padding: 40px 24px; }
-  footer .f-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-  footer .f-tag  { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+  footer .f-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; margin-bottom: 8px; letter-spacing: .04em; }
+  footer .f-tag  { font-family: 'Josefin Sans', sans-serif; font-size: 9px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
 
   .preview-note {
     background: #FEF3C7; border-bottom: 2px solid #F59E0B;
@@ -303,7 +311,7 @@
     }
     /* Remove the desktop diagonal wedge — breaks on mobile */
     .hero-left::after { display: none; }
-    .hero-left h1  { font-size: 34px; }
+    .hero-left h1  { font-size: 42px; }
     .hero-left p   { max-width: 100%; font-size: 14px; }
     .hero-cta      { margin-top: 24px; }
 
@@ -320,7 +328,7 @@
 
     /* Image grid: big image top, 2-col below */
     .image-grid-section { padding: 36px 16px 0; }
-    .section-title { font-size: 22px; }
+    .section-title { font-size: 28px; }
     .image-grid {
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 180px 130px 130px;
