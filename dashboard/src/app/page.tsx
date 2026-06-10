@@ -191,7 +191,7 @@ export default function Storefront() {
           className="fixed bottom-8 left-8 flex items-center gap-3 sm:px-5 sm:py-4 p-4 rounded-full shadow-xl text-white font-semibold text-sm transition-transform hover:scale-105"
           style={{ backgroundColor: '#25D366', boxShadow: '0 8px 28px rgba(37,211,102,0.4)' }}>
           {WA_ICON}
-          <span className="hidden sm:inline">Order on WhatsApp</span>
+          <span>Order on WhatsApp</span>
         </a>
       )}
 
@@ -201,7 +201,6 @@ export default function Storefront() {
           className="fixed bottom-8 right-8 flex items-center gap-3 sm:px-6 sm:py-4 p-4 rounded-full shadow-xl text-white font-semibold"
           style={{ backgroundColor: '#1B4332' }}>
           <ShoppingCart size={20} />
-          <span className="hidden sm:inline">View Cart ({cartCount})</span>
         </Link>
       )}
 
