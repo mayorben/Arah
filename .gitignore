@@ -1,0 +1,12 @@
+.env
+*.pyc
+__pycache__/
+.next/
+node_modules/
+*.egg-info/
+dist/
+build/
+celerybeat-schedule
+celerybeat.pid
+*.log
+.DS_Store
