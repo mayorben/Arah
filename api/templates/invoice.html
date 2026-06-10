@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --green:  #1B4332;
+    --cream:  #F8F6F0;
+    --ink:    #1A1A1A;
+    --muted:  #6B7280;
+    --gold:   #C9A84C;
+    --border: #E5E0D5;
+    --paid:   #15803D;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--green);
+    color: white;
+    padding: 36px 48px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26pt;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: white;
+  }
+
+  .brand-tagline {
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-size: 9pt;
+    opacity: 0.85;
+    line-height: 1.7;
+  }
+
+  /* ── GOLD STRIPE ── */
+  .stripe { height: 4px; background: var(--gold); }
+
+  /* ── BODY WRAPPER ── */
+  .body { padding: 36px 48px; }
+
+  /* ── INVOICE INFO BAND ── */
+  .info-band {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .invoice-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22pt;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.02em;
+  }
+
+  .invoice-number {
+    font-size: 10pt;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .meta-block label {
+    font-size: 7.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .meta-block p {
+    font-size: 9.5pt;
+    color: var(--ink);
+  }
+
+  /* ── PARTIES ── */
+  .parties {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 32px;
+  }
+
+  .party {
+    flex: 1;
+  }
+
+  .party-label {
+    font-size: 7.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .party-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13pt;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .party p {
+    font-size: 9pt;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── ITEMS TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+
+  thead tr {
+    background: var(--green);
+    color: white;
+  }
+
+  thead th {
+    padding: 10px 12px;
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+
+  thead th:last-child, thead th:nth-child(3), thead th:nth-child(4) {
+    text-align: right;
+  }
+
+  tbody tr:nth-child(even) { background: white; }
+  tbody tr:nth-child(odd)  { background: var(--cream); }
+
+  tbody td {
+    padding: 10px 12px;
+    font-size: 9.5pt;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody td:last-child, tbody td:nth-child(3), tbody td:nth-child(4) {
+    text-align: right;
+  }
+
+  /* ── TOTALS ── */
+  .totals {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 36px;
+  }
+
+  .totals-table {
+    width: 280px;
+  }
+
+  .totals-table tr td {
+    padding: 6px 0;
+    font-size: 9.5pt;
+    color: var(--muted);
+    border: none;
+    background: transparent;
+  }
+
+  .totals-table tr td:last-child { text-align: right; color: var(--ink); }
+
+  .totals-table .total-row td {
+    font-size: 13pt;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--green);
+    border-top: 2px solid var(--green);
+    padding-top: 10px;
+  }
+
+  .totals-table .total-row td:last-child { color: var(--green); }
+
+  /* ── PAYMENT BLOCK ── */
+  .payment-block {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .payment-block .section-title {
+    font-size: 7.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .payment-grid label {
+    font-size: 7.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .payment-grid span {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── PAID BADGE ── */
+  .paid-badge {
+    display: inline-block;
+    background: var(--paid);
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-thanks {
+    font-family: 'Playfair Display', serif;
+    font-size: 11pt;
+    color: var(--green);
+    font-style: italic;
+  }
+
+  .footer-contact {
+    font-size: 8pt;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.7;
+  }
+
+  /* ── WATERMARK ── */
+  {% if is_paid %}
+  body::after {
+    content: "PAID";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-family: 'Playfair Display', serif;
+    font-size: 100pt;
+    font-weight: 700;
+    color: rgba(21, 128, 61, 0.06);
+    pointer-events: none;
+    z-index: 0;
+  }
+  {% endif %}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="brand-name">{{ business.name }}</div>
+    <div class="brand-tagline">Premium Food Provisions</div>
+  </div>
+  <div class="header-meta">
+    {% if business.phone %}<div>{{ business.phone }}</div>{% endif %}
+    {% if business.email %}<div>{{ business.email }}</div>{% endif %}
+    {% if business.address %}<div>{{ business.address }}</div>{% endif %}
+  </div>
+</div>
+<div class="stripe"></div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- INVOICE INFO -->
+  <div class="info-band">
+    <div>
+      <div class="invoice-title">
+        Invoice
+        {% if is_paid %}<span class="paid-badge">Paid</span>{% endif %}
+      </div>
+      <div class="invoice-number">{{ invoice_number }}</div>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-block">
+        <label>Issue Date</label>
+        <p>{{ invoice_date }}</p>
+      </div>
+      <div class="meta-block">
+        <label>Order Ref</label>
+        <p>{{ order_number }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILL TO / SHIP TO -->
+  <div class="parties">
+    <div class="party">
+      <div class="party-label">Bill To</div>
+      <div class="party-name">{{ customer_name }}</div>
+      <p>{{ customer_phone }}</p>
+      {% if customer_address %}<p>{{ customer_address }}</p>{% endif %}
+    </div>
+    {% if delivery_address %}
+    <div class="party">
+      <div class="party-label">Deliver To</div>
+      <div class="party-name">Delivery Address</div>
+      <p>{{ delivery_address }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ITEMS -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width:42%">Item</th>
+        <th style="width:12%">Unit</th>
+        <th style="width:12%">Qty</th>
+        <th style="width:17%">Unit Price</th>
+        <th style="width:17%">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td><strong>{{ item.name }}</strong></td>
+        <td>{{ item.unit }}</td>
+        <td style="text-align:right">{{ item.quantity }}</td>
+        <td style="text-align:right">{{ item.unit_price }}</td>
+        <td style="text-align:right"><strong>{{ item.line_total }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- TOTALS -->
+  <div class="totals">
+    <table class="totals-table">
+      <tr><td>Subtotal</td><td>{{ subtotal }}</td></tr>
+      {% if discount != '₦0.00' %}
+      <tr><td>Discount</td><td>- {{ discount }}</td></tr>
+      {% endif %}
+      {% if delivery_fee != '₦0.00' %}
+      <tr><td>Delivery</td><td>{{ delivery_fee }}</td></tr>
+      {% endif %}
+      <tr class="total-row">
+        <td>Total Due</td>
+        <td>{{ total }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PAYMENT DETAILS -->
+  {% if business.bank_name %}
+  <div class="payment-block">
+    <div class="section-title">Payment Details</div>
+    <div class="payment-grid">
+      <div>
+        <label>Bank</label>
+        <span>{{ business.bank_name }}</span>
+      </div>
+      <div>
+        <label>Account Number</label>
+        <span>{{ business.account_number }}</span>
+      </div>
+      <div>
+        <label>Account Name</label>
+        <span>{{ business.account_name }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-thanks">Thank you for your business.</div>
+    <div class="footer-contact">
+      {% if business.email %}<div>{{ business.email }}</div>{% endif %}
+      {% if business.phone %}<div>{{ business.phone }}</div>{% endif %}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
