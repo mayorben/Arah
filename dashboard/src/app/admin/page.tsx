@@ -1,8 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { TrendingUp, ShoppingBag, Users, AlertTriangle, Package, BarChart2, LogOut } from 'lucide-react';
+import { TrendingUp, ShoppingBag, Users, AlertTriangle } from 'lucide-react';
 import { api, naira, login } from '@/lib/api';
 
 interface Overview {
@@ -24,7 +22,6 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
-  const router = useRouter();
   const [authed, setAuthed] = useState(false);
   const [loginForm, setLoginForm] = useState({ u: '', p: '' });
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -41,11 +38,13 @@ export default function AdminDashboard() {
   };
 
   const handleLogin = async () => {
-    try { await login(loginForm.u, loginForm.p); setAuthed(true); fetchOverview(); }
-    catch { alert('Invalid credentials'); }
+    try {
+      await login(loginForm.u, loginForm.p);
+      setAuthed(true);
+      window.dispatchEvent(new Event('arah:auth'));
+      fetchOverview();
+    } catch { alert('Invalid credentials'); }
   };
-
-  const logout = () => { localStorage.removeItem('arah_token'); setAuthed(false); };
 
   if (!authed) {
     return (
@@ -67,35 +66,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F6F0' }}>
-      {/* SIDEBAR */}
-      <div className="flex">
-        <aside className="w-56 min-h-screen fixed top-0 left-0 flex flex-col py-8 px-5" style={{ backgroundColor: '#1B4332' }}>
-          <div className="mb-10">
-            <p className="font-serif text-xl font-bold text-white">Arah</p>
-            <p className="text-xs tracking-widest uppercase" style={{ color: '#C9A84C' }}>Admin</p>
-          </div>
-          <nav className="flex-1 space-y-1">
-            {[
-              { href: '/admin', icon: BarChart2, label: 'Overview' },
-              { href: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
-              { href: '/admin/products', icon: Package, label: 'Products' },
-              { href: '/admin/inventory', icon: TrendingUp, label: 'Inventory' },
-              { href: '/admin/customers', icon: Users, label: 'Customers' },
-            ].map(({ href, icon: Icon, label }) => (
-              <Link key={href} href={href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all">
-                <Icon size={16} />{label}
-              </Link>
-            ))}
-          </nav>
-          <button onClick={logout} className="flex items-center gap-2 text-white/50 hover:text-white text-sm mt-4 transition-colors">
-            <LogOut size={14} /> Sign out
-          </button>
-        </aside>
-
-        {/* MAIN CONTENT */}
-        <main className="ml-56 flex-1 p-8">
+    <div className="p-8">
           <h1 className="font-serif text-2xl font-bold mb-8" style={{ color: '#1B4332' }}>Overview</h1>
 
           {overview ? (
@@ -174,8 +145,6 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
-        </main>
-      </div>
     </div>
   );
 }

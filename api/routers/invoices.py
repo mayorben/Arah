@@ -1,5 +1,7 @@
+import io
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from core.database import get_db
@@ -36,6 +38,29 @@ async def get_download_url(invoice_id: str, db: AsyncSession = Depends(get_db)):
     settings = get_settings()
     url = get_presigned_url(settings.minio_bucket_invoices, inv.pdf_object_key, expires_days=1)
     return {"url": url}
+
+
+@router.get("/{invoice_id}/pdf")
+async def stream_pdf(invoice_id: str, db: AsyncSession = Depends(get_db)):
+    """Public endpoint — streams the invoice PDF directly from MinIO."""
+    try:
+        inv = await db.get(Invoice, uuid.UUID(invoice_id))
+    except ValueError:
+        raise HTTPException(404, "Invoice not found")
+    if not inv or not inv.pdf_object_key:
+        raise HTTPException(404, "PDF not ready yet")
+    from services.minio_client import get_object_bytes
+    from core.config import get_settings
+    settings = get_settings()
+    try:
+        data = get_object_bytes(settings.minio_bucket_invoices, inv.pdf_object_key)
+    except Exception:
+        raise HTTPException(404, "PDF not available")
+    return StreamingResponse(
+        io.BytesIO(data),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename={inv.invoice_number}.pdf"},
+    )
 
 
 @router.post("/{invoice_id}/resend", dependencies=[Depends(get_current_admin)])

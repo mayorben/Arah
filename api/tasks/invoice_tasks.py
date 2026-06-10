@@ -13,8 +13,8 @@ def generate_and_send_invoice(self, invoice_id: str):
     from models.order import Order
     from models.customer import Customer
     from services.invoice_pdf import render_invoice
-    from services.minio_client import upload_bytes, get_presigned_url, ensure_buckets
-    from services.whatsapp_client import send_document_link, send_text
+    from services.minio_client import upload_bytes, ensure_buckets
+    from services.whatsapp_client import send_text
     from core.config import get_settings
 
     settings = get_settings()
@@ -39,7 +39,9 @@ def generate_and_send_invoice(self, invoice_id: str):
             # Upload to MinIO
             ensure_buckets()
             upload_bytes(settings.minio_bucket_invoices, key, pdf_bytes, "application/pdf")
-            pdf_url = get_presigned_url(settings.minio_bucket_invoices, key, expires_days=7)
+
+            # Streaming endpoint URL — works without presigned URL hostname issues
+            pdf_link = f"{settings.base_url}/api/invoices/{invoice_id}/pdf"
 
             # Update invoice record
             invoice.pdf_object_key = key
@@ -49,12 +51,13 @@ def generate_and_send_invoice(self, invoice_id: str):
 
             # Send via WhatsApp if customer has a WhatsApp ID
             if customer.whatsapp_id:
-                send_document_link(
-                    to=customer.whatsapp_id,
-                    url=pdf_url,
-                    caption=f"Your invoice for order {order.order_number} from {settings.business_name}. Total: ₦{order.total_amount:,.2f}",
-                    filename=f"{invoice.invoice_number}.pdf",
+                msg = (
+                    f"📄 *Invoice Ready — {settings.business_name}*\n\n"
+                    f"Order: *{order.order_number}*\n"
+                    f"Total: *₦{float(order.total_amount):,.2f}*\n\n"
+                    f"Download your invoice here:\n{pdf_link}"
                 )
+                send_text(to=customer.whatsapp_id, message=msg)
                 invoice.whatsapp_sent = True
                 invoice.whatsapp_sent_at = datetime.now(timezone.utc)
                 db.commit()

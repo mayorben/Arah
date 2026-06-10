@@ -37,9 +37,19 @@ def upload_bytes(bucket: str, key: str, data: bytes, content_type: str = "applic
 def get_presigned_url(bucket: str, key: str, expires_days: int = 7) -> str:
     client = get_minio()
     url = client.presigned_get_object(bucket, key, expires=timedelta(days=expires_days))
-    # Rewrite internal minio hostname to public URL
     internal = f"http://{settings.minio_endpoint}"
-    return url.replace(internal, settings.minio_public_url.rstrip("/storage").rstrip("/"))
+    public = settings.minio_public_url.rstrip("/")
+    return url.replace(internal, public, 1)
+
+
+def get_object_bytes(bucket: str, key: str) -> bytes:
+    client = get_minio()
+    response = client.get_object(bucket, key)
+    try:
+        return response.read()
+    finally:
+        response.close()
+        response.release_conn()
 
 
 def get_public_url(bucket: str, key: str) -> str:

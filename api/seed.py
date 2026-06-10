@@ -1,6 +1,8 @@
 """Run once to seed initial products: python seed.py"""
 import asyncio
 from core.database import AsyncSessionLocal, engine, Base
+# Import all models so Base.metadata.create_all creates every table
+import models  # noqa: F401
 from models.product import Product
 
 
