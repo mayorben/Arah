@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arah Provisions — Storefront Preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --green:  #1B4332;
+    --green2: #145129;
     --cream:  #F8F6F0;
     --gold:   #C9A84C;
     --ink:    #1A1A1A;
@@ -40,28 +41,190 @@
   .cart-badge { position: absolute; top: -8px; right: -8px; background: #FBBF24; color: #000; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
   .nav-link   { color: rgba(255,255,255,.6); font-size: 13px; text-decoration: none; cursor: pointer; }
 
-  /* ─── HERO ─── */
+  /* ─── SPLIT HERO ─── */
   .hero {
-    background: var(--green);
-    color: white;
-    padding: 80px 40px 72px;
+    display: flex;
+    min-height: 580px;
   }
-  .hero-inner { max-width: 900px; margin: 0 auto; }
+
+  .hero-left {
+    flex: 0 0 46%;
+    background: var(--green);
+    padding: 72px 60px 72px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: 0; bottom: 0;
+    width: 80px;
+    background: var(--green);
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    z-index: 2;
+  }
+
   .hero-label { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; line-height: 1.15; margin-bottom: 18px; }
-  .hero p  { color: rgba(255,255,255,.7); font-size: 17px; max-width: 520px; line-height: 1.65; }
+  .hero-left h1 { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; line-height: 1.15; margin-bottom: 18px; color: white; }
+  .hero-left p  { color: rgba(255,255,255,.7); font-size: 15px; max-width: 380px; line-height: 1.7; }
   .hero-cta {
     display: inline-flex; align-items: center; gap: 8px;
     margin-top: 34px; padding: 14px 28px;
     background: var(--gold); color: var(--ink);
     font-size: 13px; font-weight: 600;
     border-radius: 2px; cursor: pointer;
-    text-decoration: none;
+    text-decoration: none; width: fit-content;
+    transition: background .15s;
   }
+  .hero-cta:hover { background: #b8973d; }
+
+  /* ─── HERO CAROUSEL ─── */
+  .hero-right {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #0d2b1e;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .carousel-slide.active { opacity: 1; }
+  .carousel-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .carousel-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(27,67,50,.3) 0%, transparent 60%);
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 28px; left: 48px; z-index: 3;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .6s .3s ease, transform .6s .3s ease;
+  }
+  .carousel-slide.active .slide-caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .slide-caption span {
+    background: rgba(27,67,50,.75);
+    backdrop-filter: blur(6px);
+    color: rgba(255,255,255,.9);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 2px;
+    border-left: 2px solid var(--gold);
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 20px; right: 24px; z-index: 4;
+    display: flex; gap: 6px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,.4);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+    border: none; padding: 0;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.2); }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    z-index: 4;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,.2);
+    color: white;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .carousel-arrow:hover { background: rgba(255,255,255,.25); }
+  .carousel-arrow.prev { left: 16px; }
+  .carousel-arrow.next { right: 16px; }
+
   .stripe { height: 4px; background: var(--gold); }
 
+  /* ─── FEATURED IMAGE GRID ─── */
+  .image-grid-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 40px 0;
+  }
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 24px;
+  }
+  .image-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 220px 220px;
+    gap: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .grid-img {
+    position: relative;
+    overflow: hidden;
+  }
+  .grid-img:first-child {
+    grid-row: 1 / 3;
+  }
+  .grid-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s ease;
+  }
+  .grid-img:hover img { transform: scale(1.05); }
+  .grid-img-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(27,67,50,.78));
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 32px 14px 12px;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .grid-img:hover .grid-img-label { opacity: 1; }
+
   /* ─── PRODUCTS SECTION ─── */
-  .products-section { max-width: 1100px; margin: 0 auto; padding: 56px 40px 80px; }
+  .products-section { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
   .section-filters   { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
   .filter-pill {
     padding: 6px 18px; font-size: 11px; font-weight: 600;
@@ -83,17 +246,29 @@
   .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
 
   .card-img {
-    height: 190px; background: var(--cream);
-    display: flex; align-items: center; justify-content: center;
-    position: relative; overflow: hidden;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
   }
-  .card-img img { width: 100%; height: 100%; object-fit: cover; }
-  .card-initial { font-family: 'Playfair Display', serif; font-size: 56px; color: var(--gold); font-weight: 600; }
+  .card-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s ease;
+  }
+  .card:hover .card-img img { transform: scale(1.05); }
+  .card-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%);
+  }
   .card-badge {
     position: absolute; top: 12px; left: 12px;
     background: var(--green); color: white;
     font-size: 9px; font-weight: 700; letter-spacing: .1em;
     text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+    z-index: 1;
   }
 
   .card-body { padding: 18px 20px 20px; }
@@ -109,7 +284,7 @@
     font-size: 12px; font-weight: 600; border-radius: 2px; border: none; cursor: pointer;
     transition: background .15s;
   }
-  .add-btn:hover { background: #145129; }
+  .add-btn:hover { background: var(--green2); }
   .qty-control { display: flex; align-items: center; gap: 8px; }
   .qty-btn {
     width: 28px; height: 28px; border-radius: 50%;
@@ -171,9 +346,10 @@
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- SPLIT HERO -->
 <div class="hero">
-  <div class="hero-inner">
+  <!-- Left: text -->
+  <div class="hero-left">
     <p class="hero-label">Premium Quality</p>
     <h1>The finest provisions,<br>delivered to your door.</h1>
     <p>Rice, beans, palm oil and everything your kitchen needs — sourced with care, packed with pride.</p>
@@ -184,8 +360,74 @@
       </svg>
     </a>
   </div>
+
+  <!-- Right: image carousel -->
+  <div class="hero-right">
+    <div class="carousel-slide active">
+      <img src="https://source.unsplash.com/1000x700/?rice,grain,harvest&sig=101" alt="Grains" loading="eager" />
+      <div class="slide-caption"><span>Premium Grains</span></div>
+    </div>
+    <div class="carousel-slide">
+      <img src="https://source.unsplash.com/1000x700/?african+food,market,produce&sig=102" alt="Market" loading="lazy" />
+      <div class="slide-caption"><span>Fresh from Source</span></div>
+    </div>
+    <div class="carousel-slide">
+      <img src="https://source.unsplash.com/1000x700/?cooking+oil,spices,kitchen&sig=103" alt="Oils" loading="lazy" />
+      <div class="slide-caption"><span>Oils &amp; Seasonings</span></div>
+    </div>
+    <div class="carousel-slide">
+      <img src="https://source.unsplash.com/1000x700/?beans,legumes,natural+food&sig=104" alt="Legumes" loading="lazy" />
+      <div class="slide-caption"><span>Legumes &amp; More</span></div>
+    </div>
+
+    <button class="carousel-arrow prev" onclick="carouselStep(-1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="carousel-arrow next" onclick="carouselStep(1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
+    <div class="carousel-dots">
+      <button class="dot active" onclick="goToSlide(0)"></button>
+      <button class="dot" onclick="goToSlide(1)"></button>
+      <button class="dot" onclick="goToSlide(2)"></button>
+      <button class="dot" onclick="goToSlide(3)"></button>
+    </div>
+  </div>
 </div>
 <div class="stripe"></div>
+
+<!-- IMAGE GRID — Our Provisions -->
+<div class="image-grid-section">
+  <p class="section-eyebrow">Sourced with care</p>
+  <h2 class="section-title">Our Provisions</h2>
+  <div class="image-grid">
+    <div class="grid-img">
+      <img src="https://source.unsplash.com/900x700/?rice,grain,sack,harvest&sig=201" alt="Rice">
+      <div class="grid-img-label">Premium Rice</div>
+    </div>
+    <div class="grid-img">
+      <img src="https://source.unsplash.com/500x320/?cooking+oil,amber,bottle&sig=202" alt="Palm Oil">
+      <div class="grid-img-label">Palm Oil</div>
+    </div>
+    <div class="grid-img">
+      <img src="https://source.unsplash.com/500x320/?beans,legumes,bowl&sig=203" alt="Beans">
+      <div class="grid-img-label">Beans</div>
+    </div>
+    <div class="grid-img">
+      <img src="https://source.unsplash.com/500x320/?dried+fish,seafood,spice&sig=204" alt="Crayfish">
+      <div class="grid-img-label">Crayfish</div>
+    </div>
+    <div class="grid-img">
+      <img src="https://source.unsplash.com/500x320/?flour,powder,starch,grain&sig=205" alt="Garri">
+      <div class="grid-img-label">Garri &amp; Swallow</div>
+    </div>
+  </div>
+</div>
 
 <!-- PRODUCTS -->
 <div class="products-section" id="products">
@@ -200,10 +442,11 @@
 
   <div class="product-grid">
 
-    <!-- Card 1 — Featured, with qty control -->
+    <!-- Card 1 — Featured, qty control -->
     <div class="card">
-      <div class="card-img" style="background: #EEF5EE;">
-        <span class="card-initial">O</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?brown+rice,unpolished+rice,grain&sig=1" alt="Ofada Rice" />
+        <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
       <div class="card-body">
@@ -223,8 +466,9 @@
 
     <!-- Card 2 -->
     <div class="card">
-      <div class="card-img" style="background: #EEF5EE;">
-        <span class="card-initial">L</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?white+rice,cooked+rice,fluffy&sig=2" alt="Long Grain Rice" />
+        <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
         <p class="card-cat">Grains</p>
@@ -239,8 +483,9 @@
 
     <!-- Card 3 — Featured -->
     <div class="card">
-      <div class="card-img" style="background: #FFF7E6;">
-        <span class="card-initial">P</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?cooking+oil,red+oil,palm&sig=3" alt="Palm Oil" />
+        <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
       <div class="card-body">
@@ -256,8 +501,9 @@
 
     <!-- Card 4 — Featured -->
     <div class="card">
-      <div class="card-img" style="background: #F5EEF0;">
-        <span class="card-initial">O</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?beans,brown+beans,legume&sig=4" alt="Oloyin Beans" />
+        <div class="card-img-overlay"></div>
         <span class="card-badge">Featured</span>
       </div>
       <div class="card-body">
@@ -273,8 +519,9 @@
 
     <!-- Card 5 -->
     <div class="card">
-      <div class="card-img" style="background: #EEF5EE;">
-        <span class="card-initial">G</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?cassava,tapioca,flour,starch&sig=5" alt="Garri" />
+        <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
         <p class="card-cat">Swallow</p>
@@ -289,8 +536,9 @@
 
     <!-- Card 6 -->
     <div class="card">
-      <div class="card-img" style="background: #F5EEF0;">
-        <span class="card-initial">C</span>
+      <div class="card-img">
+        <img src="https://source.unsplash.com/600x400/?dried+shrimp,seafood,spice,seasoning&sig=6" alt="Crayfish" />
+        <div class="card-img-overlay"></div>
       </div>
       <div class="card-body">
         <p class="card-cat">Seasonings</p>
@@ -321,7 +569,31 @@
 </footer>
 
 <script>
-  // Filter pills interaction
+  // ── Carousel ──
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots   = document.querySelectorAll('.dot');
+  let current  = 0;
+  let timer;
+
+  function goToSlide(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    resetTimer();
+  }
+
+  function carouselStep(dir) { goToSlide(current + dir); }
+
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => goToSlide(current + 1), 4500);
+  }
+
+  resetTimer();
+
+  // ── Filter pills ──
   document.querySelectorAll('.filter-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
