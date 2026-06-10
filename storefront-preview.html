@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arah Provisions — Storefront Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green:  #1B4332;
+    --cream:  #F8F6F0;
+    --gold:   #C9A84C;
+    --ink:    #1A1A1A;
+    --muted:  #6B7280;
+    --border: #E5E0D5;
+    --white:  #ffffff;
+  }
+
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+
+  /* ─── NAV ─── */
+  nav {
+    background: var(--green);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: white; }
+  .brand-sub  { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+  .nav-right  { display: flex; align-items: center; gap: 24px; }
+  .cart-wrap  { position: relative; cursor: pointer; }
+  .cart-icon  { width: 22px; height: 22px; color: white; }
+  .cart-badge { position: absolute; top: -8px; right: -8px; background: #FBBF24; color: #000; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .nav-link   { color: rgba(255,255,255,.6); font-size: 13px; text-decoration: none; cursor: pointer; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--green);
+    color: white;
+    padding: 80px 40px 72px;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; }
+  .hero-label { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; line-height: 1.15; margin-bottom: 18px; }
+  .hero p  { color: rgba(255,255,255,.7); font-size: 17px; max-width: 520px; line-height: 1.65; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 34px; padding: 14px 28px;
+    background: var(--gold); color: var(--ink);
+    font-size: 13px; font-weight: 600;
+    border-radius: 2px; cursor: pointer;
+    text-decoration: none;
+  }
+  .stripe { height: 4px; background: var(--gold); }
+
+  /* ─── PRODUCTS SECTION ─── */
+  .products-section { max-width: 1100px; margin: 0 auto; padding: 56px 40px 80px; }
+  .section-filters   { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+  .filter-pill {
+    padding: 6px 18px; font-size: 11px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    border-radius: 999px; border: 1.5px solid var(--gold);
+    color: var(--green); cursor: pointer; background: transparent;
+    transition: all .2s;
+  }
+  .filter-pill.active { background: var(--green); color: white; border-color: var(--green); }
+
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  .card {
+    background: white; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    transition: box-shadow .2s, transform .15s;
+  }
+  .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+  .card-img {
+    height: 190px; background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-initial { font-family: 'Playfair Display', serif; font-size: 56px; color: var(--gold); font-weight: 600; }
+  .card-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--green); color: white;
+    font-size: 9px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+  }
+
+  .card-body { padding: 18px 20px 20px; }
+  .card-cat  { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .card-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-bottom: 16px; min-height: 36px; }
+
+  .card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .card-price  { font-weight: 700; font-size: 17px; color: var(--green); }
+  .card-unit   { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .add-btn {
+    padding: 8px 18px; background: var(--green); color: white;
+    font-size: 12px; font-weight: 600; border-radius: 2px; border: none; cursor: pointer;
+    transition: background .15s;
+  }
+  .add-btn:hover { background: #145129; }
+  .qty-control { display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 16px; font-weight: 600; border: 1.5px solid var(--green);
+    background: transparent; color: var(--green); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .qty-btn.plus { background: var(--green); color: white; border-color: var(--green); }
+  .qty-num { font-weight: 600; font-size: 14px; min-width: 16px; text-align: center; }
+
+  /* ─── FLOATING CART ─── */
+  .float-cart {
+    position: fixed; bottom: 32px; right: 32px;
+    background: var(--green); color: white;
+    padding: 16px 26px; border-radius: 999px;
+    font-weight: 600; font-size: 14px;
+    box-shadow: 0 8px 28px rgba(27,67,50,.45);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; z-index: 100;
+    transition: transform .15s;
+  }
+  .float-cart:hover { transform: scale(1.03); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--green); color: white;
+    text-align: center; padding: 40px 24px;
+  }
+  footer .f-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  footer .f-tag  { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+
+  /* ─── PREVIEW LABEL ─── */
+  .preview-note {
+    background: #FEF3C7; border-bottom: 2px solid #F59E0B;
+    padding: 10px 20px; font-size: 12px; font-weight: 600;
+    color: #92400E; text-align: center; letter-spacing: .05em;
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-note">⚡ STOREFRONT PREVIEW — Static demo with sample data</div>
+
+<!-- NAV -->
+<nav>
+  <div class="brand">
+    <span class="brand-name">Arah</span>
+    <span class="brand-sub">Provisions</span>
+  </div>
+  <div class="nav-right">
+    <div class="cart-wrap">
+      <svg class="cart-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13H5.4M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+      </svg>
+      <span class="cart-badge">2</span>
+    </div>
+    <a class="nav-link">Admin</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <p class="hero-label">Premium Quality</p>
+    <h1>The finest provisions,<br>delivered to your door.</h1>
+    <p>Rice, beans, palm oil and everything your kitchen needs — sourced with care, packed with pride.</p>
+    <a class="hero-cta" href="#products">
+      Shop Now
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</div>
+<div class="stripe"></div>
+
+<!-- PRODUCTS -->
+<div class="products-section" id="products">
+  <div class="section-filters">
+    <button class="filter-pill active">All</button>
+    <button class="filter-pill">Grains</button>
+    <button class="filter-pill">Legumes</button>
+    <button class="filter-pill">Oils &amp; Fats</button>
+    <button class="filter-pill">Swallow</button>
+    <button class="filter-pill">Seasonings</button>
+  </div>
+
+  <div class="product-grid">
+
+    <!-- Card 1 — Featured, with qty control -->
+    <div class="card">
+      <div class="card-img" style="background: #EEF5EE;">
+        <span class="card-initial">O</span>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Grains</p>
+        <h3 class="card-name">Ofada Rice</h3>
+        <p class="card-desc">Locally grown, richly aromatic. The rice that makes the stew worth it.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦4,500</span><span class="card-unit">/ 5kg bag</span></div>
+          <div class="qty-control">
+            <button class="qty-btn">−</button>
+            <span class="qty-num">2</span>
+            <button class="qty-btn plus">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+      <div class="card-img" style="background: #EEF5EE;">
+        <span class="card-initial">L</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Grains</p>
+        <h3 class="card-name">Long Grain Rice</h3>
+        <p class="card-desc">Clean, fluffy grains for everyday family meals.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦28,000</span><span class="card-unit">/ 25kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 — Featured -->
+    <div class="card">
+      <div class="card-img" style="background: #FFF7E6;">
+        <span class="card-initial">P</span>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Oils &amp; Fats</p>
+        <h3 class="card-name">Palm Oil</h3>
+        <p class="card-desc">Deep red, rich in flavour. The foundation of Nigerian cuisine.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦6,500</span><span class="card-unit">/ 5L bottle</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 — Featured -->
+    <div class="card">
+      <div class="card-img" style="background: #F5EEF0;">
+        <span class="card-initial">O</span>
+        <span class="card-badge">Featured</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Legumes</p>
+        <h3 class="card-name">Oloyin Beans</h3>
+        <p class="card-desc">Honey beans — sweet, creamy, and full of goodness.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦5,200</span><span class="card-unit">/ 5kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="card">
+      <div class="card-img" style="background: #EEF5EE;">
+        <span class="card-initial">G</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Swallow</p>
+        <h3 class="card-name">Garri (White)</h3>
+        <p class="card-desc">Freshly processed, fine-grade. Eat as eba or soak — no wrong answer.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦4,200</span><span class="card-unit">/ 10kg bag</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="card">
+      <div class="card-img" style="background: #F5EEF0;">
+        <span class="card-initial">C</span>
+      </div>
+      <div class="card-body">
+        <p class="card-cat">Seasonings</p>
+        <h3 class="card-name">Crayfish</h3>
+        <p class="card-desc">Smoky, pungent, irreplaceable. The soul of every great Nigerian soup.</p>
+        <div class="card-footer">
+          <div><span class="card-price">₦1,500</span><span class="card-unit">/ 500g pack</span></div>
+          <button class="add-btn">Add</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FLOATING CART -->
+<div class="float-cart">
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007 17h11M7 13H5.4M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+  </svg>
+  View Cart (2)
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p class="f-name">Arah Provisions</p>
+  <p class="f-tag">Premium Quality · Honest Prices</p>
+</footer>
+
+<script>
+  // Filter pills interaction
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
