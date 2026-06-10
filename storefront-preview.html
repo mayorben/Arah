@@ -263,6 +263,86 @@
     padding: 10px 20px; font-size: 12px; font-weight: 600;
     color: #92400E; text-align: center; letter-spacing: .05em;
   }
+
+  /* ─── TABLET ─── */
+  @media (max-width: 900px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .image-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 200px 160px 160px;
+    }
+    .grid-img:first-child { grid-row: auto; grid-column: 1 / 3; }
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 640px) {
+    nav { padding: 14px 20px; }
+    .brand-name { font-size: 22px; }
+
+    /* Full-bleed hero: carousel fills entire area, text overlaid at bottom */
+    .hero {
+      flex-direction: column;
+      min-height: 92vh;
+      position: relative;
+    }
+    .hero-left {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      width: 100%;
+      /* Dark green fades in from bottom — text sits on top of it */
+      background: linear-gradient(
+        to top,
+        rgba(27,67,50,.97) 0%,
+        rgba(27,67,50,.82) 38%,
+        rgba(27,67,50,.4)  62%,
+        transparent        100%
+      );
+      padding: 0 24px 44px;
+      justify-content: flex-end;
+    }
+    /* Remove the desktop diagonal wedge — breaks on mobile */
+    .hero-left::after { display: none; }
+    .hero-left h1  { font-size: 34px; }
+    .hero-left p   { max-width: 100%; font-size: 14px; }
+    .hero-cta      { margin-top: 24px; }
+
+    /* Carousel fills full hero as background */
+    .hero-right {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .carousel-arrow.prev { left: 10px; }
+    .carousel-arrow.next { right: 10px; }
+    .carousel-dots { bottom: 52px; right: 20px; }
+    .slide-caption { left: 24px; bottom: 52px; }
+
+    /* Image grid: big image top, 2-col below */
+    .image-grid-section { padding: 36px 16px 0; }
+    .section-title { font-size: 22px; }
+    .image-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 180px 130px 130px;
+    }
+    .grid-img:first-child { grid-row: auto; grid-column: 1 / 3; }
+
+    /* Products: 2 columns, tighter padding */
+    .products-section { padding: 36px 16px 80px; }
+    .section-filters { gap: 8px; }
+    .filter-pill { padding: 5px 14px; font-size: 10px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .card-img { height: 150px; }
+    .card-body { padding: 14px 14px 16px; }
+    .card-name { font-size: 14px; }
+    .card-desc { font-size: 11.5px; min-height: 0; margin-bottom: 12px; }
+    .card-price { font-size: 15px; }
+    .add-btn { padding: 7px 12px; font-size: 11px; }
+    .qty-btn { width: 24px; height: 24px; font-size: 14px; }
+
+    /* Float cart */
+    .float-cart { padding: 12px 18px; font-size: 13px; bottom: 20px; right: 14px; }
+  }
 </style>
 </head>
 <body>
