@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     # WhatsApp Cloud API
     whatsapp_phone_number_id: str = ""
     whatsapp_access_token: str = ""
+    whatsapp_app_secret: str = ""      # Meta App → Settings → Basic → App Secret
     whatsapp_verify_token: str = "arah_verify_token"
     whatsapp_api_version: str = "v21.0"
     owner_whatsapp_number: str = ""
