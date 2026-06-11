@@ -42,7 +42,7 @@ async def get_download_url(invoice_id: str, db: AsyncSession = Depends(get_db)):
 
 @router.get("/{invoice_id}/pdf")
 async def stream_pdf(invoice_id: str, db: AsyncSession = Depends(get_db)):
-    """Public endpoint — streams the invoice PDF directly from MinIO."""
+    """Public endpoint — streams the invoice PDF from Supabase Storage."""
     try:
         inv = await db.get(Invoice, uuid.UUID(invoice_id))
     except ValueError:
