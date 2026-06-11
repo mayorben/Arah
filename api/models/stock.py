@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Text, Numeric, ForeignKey
+from sqlalchemy import String, Text, Numeric, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from core.database import Base
@@ -20,7 +20,7 @@ class StockMovement(Base):
     unit_cost: Mapped[float | None] = mapped_column(Numeric(12, 2))
     notes: Mapped[str | None] = mapped_column(Text)
     created_by: Mapped[str | None] = mapped_column(String(200))
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     product: Mapped["Product"] = relationship("Product", foreign_keys=[product_id], lazy="selectin")  # noqa: F821
     supplier: Mapped["Supplier"] = relationship("Supplier", foreign_keys=[supplier_id], lazy="selectin")  # noqa: F821

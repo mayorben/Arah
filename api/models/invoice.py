@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Text, Integer, Boolean, Date, ForeignKey
+from sqlalchemy import String, Text, Integer, Boolean, Date, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from core.database import Base
@@ -17,11 +17,12 @@ class Invoice(Base):
     pdf_object_key: Mapped[str | None] = mapped_column(Text)
     pdf_size_bytes: Mapped[int | None] = mapped_column(Integer)
     whatsapp_sent: Mapped[bool] = mapped_column(Boolean, default=False)
-    whatsapp_sent_at: Mapped[datetime | None] = mapped_column()
+    whatsapp_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     due_date: Mapped[datetime | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
