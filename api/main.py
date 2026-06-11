@@ -12,8 +12,11 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create all tables on startup (safe if already exist)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        print(f"Warning: DB table creation failed (check DATABASE_URL_OVERRIDE): {e}")
 
     # Ensure Supabase Storage buckets exist
     try:
