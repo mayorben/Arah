@@ -19,6 +19,15 @@
 #   BUSINESS_NAME           Arah Provisions
 #   BASE_URL                https://arah-api.onrender.com   (your Render URL)
 
+databases:
+  # Free Render PostgreSQL — 1 GB, auto-wired to arah-api.
+  # If you prefer Supabase, set DATABASE_URL_OVERRIDE manually on the service
+  # and this database will be ignored (override takes priority).
+  - name: arah-db
+    databaseName: arah
+    user: arah
+    plan: free
+
 services:
 
   # ── FastAPI Web Service ────────────────────────────────────────────────────
@@ -30,6 +39,11 @@ services:
     dockerCommand: uvicorn main:app --host 0.0.0.0 --port 8000
     healthCheckPath: /health
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL_OVERRIDE
+        fromDatabase:
+          name: arah-db
+          property: connectionString
 
   # ── Celery Worker ──────────────────────────────────────────────────────────
   - type: worker
@@ -39,6 +53,11 @@ services:
     dockerfilePath: Dockerfile
     dockerCommand: celery -A tasks.celery_app worker --loglevel=info -Q default,invoices,whatsapp,alerts
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL_OVERRIDE
+        fromDatabase:
+          name: arah-db
+          property: connectionString
 
   # ── Celery Beat Scheduler ──────────────────────────────────────────────────
   - type: worker
@@ -48,3 +67,8 @@ services:
     dockerfilePath: Dockerfile
     dockerCommand: celery -A tasks.celery_app beat --loglevel=info --scheduler celery.beat.PersistentScheduler
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL_OVERRIDE
+        fromDatabase:
+          name: arah-db
+          property: connectionString
