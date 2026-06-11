@@ -171,3 +171,72 @@ body {
   }
   .grid-img:first-child { grid-row: auto; grid-column: 1 / 3; }
 }
+
+/* ─── PROVISIONS CAROUSEL ─── */
+.prov-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  height: 400px;
+}
+.prov-track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.prov-slide {
+  flex: 0 0 100%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.prov-slide img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; transition: transform 0.5s ease;
+}
+.prov-slide:hover img { transform: scale(1.04); }
+.prov-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(27,67,50,.88));
+  color: white; padding: 60px 36px 32px;
+}
+.prov-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.14); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.22); color: white;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 3; transition: background .2s;
+}
+.prov-arrow:hover { background: rgba(255,255,255,.3); }
+.prov-arrow-left  { left: 20px; }
+.prov-arrow-right { right: 20px; }
+.prov-dots {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 3;
+}
+.prov-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.4); border: none; cursor: pointer;
+  transition: background .2s, transform .2s; padding: 0;
+}
+.prov-dot.active { background: var(--gold); transform: scale(1.35); }
+
+/* Mobile: grid-img-label always visible (no hover on touch) */
+@media (hover: none) {
+  .grid-img-label { opacity: 1 !important; }
+}
+
+/* Standalone PWA: safe area insets */
+@media (display-mode: standalone) {
+  nav { padding-top: max(16px, env(safe-area-inset-top)) !important; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+@media (max-width: 640px) {
+  .prov-carousel { height: 260px; border-radius: 8px; }
+  .prov-label { padding: 36px 20px 20px; }
+  .prov-arrow { width: 36px; height: 36px; }
+}

@@ -59,8 +59,10 @@ export default function OrderPage() {
     script.src = 'https://js.paystack.co/v1/inline.js';
     script.async = true;
     script.onload  = () => setPaystackReady(true);
-    script.onerror = () => console.warn('Paystack script failed to load');
+    script.onerror = () => setPaystackReady(true); // let it proceed; openPaystack will surface the error
     document.head.appendChild(script);
+    const fallback = setTimeout(() => setPaystackReady(true), 8000);
+    return () => clearTimeout(fallback);
   }, []);
 
   // Build cart from localStorage + API
