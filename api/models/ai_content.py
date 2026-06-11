@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Text, Boolean, ForeignKey
+from sqlalchemy import String, Text, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from core.database import Base
@@ -14,5 +14,5 @@ class AIContent(Base):
     content_type: Mapped[str] = mapped_column(String(50), nullable=False)
     generated_text: Mapped[str] = mapped_column(Text, nullable=False)
     accepted: Mapped[bool] = mapped_column(Boolean, default=False)
-    applied_at: Mapped[datetime | None] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
