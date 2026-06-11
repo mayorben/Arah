@@ -106,7 +106,7 @@ export default function ProductsPage() {
                       Featured
                     </span>
                   )}
-                  {p.stock_quantity <= 0 && (
+                  {p.stock_quantity < 0 && (
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Out of Stock</span>
                     </div>
@@ -124,7 +124,7 @@ export default function ProductsPage() {
                       <span className="font-display" style={{ fontWeight: 600, fontSize: 20, color: 'var(--green)' }}>{naira(p.sale_price)}</span>
                       <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 4, fontWeight: 300 }}>/ {p.unit}</span>
                     </div>
-                    {p.stock_quantity > 0 && (
+                    {p.stock_quantity >= 0 && (
                       <Link href="/order" className="font-label" style={{ padding: '8px 18px', background: 'var(--green)', color: 'white', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', borderRadius: 2, textDecoration: 'none' }}>
                         Order
                       </Link>
