@@ -113,7 +113,12 @@ export default function Storefront() {
     setCart((c) => { const n = { ...c }; if (n[id] > 1) n[id]--; else delete n[id]; return n; });
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const categories = ['All', ...new Set(products.map((p) => p.category).filter(Boolean))];
+
+  const DEFAULT_CATS = ['Grains', 'Legumes', 'Oils & Fats', 'Swallow', 'Seasonings'];
+  const dbCats = [...new Set(products.map((p) => p.category).filter(Boolean))];
+  const extraCats = dbCats.filter((c) => !DEFAULT_CATS.includes(c));
+  const categories = ['All', ...DEFAULT_CATS, ...extraCats];
+
   const visible = activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
 
   return (
@@ -220,15 +225,13 @@ export default function Storefront() {
           </div>
         ) : (
           <>
-            {categories.length > 1 && (
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
-                {categories.map((cat) => (
-                  <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}>
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
+              {categories.map((cat) => (
+                <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}>
+                  {cat}
+                </button>
+              ))}
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="product-grid-responsive">
               {visible.map((p) => (
