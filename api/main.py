@@ -25,6 +25,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"Warning: Storage setup failed: {e}")
 
+    # Auto-seed products if database is empty
+    try:
+        from seed import seed
+        await seed()
+    except Exception as e:
+        print(f"Warning: Seed failed: {e}")
+
     yield
 
 
