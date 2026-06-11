@@ -28,12 +28,16 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        if self.database_url_override:
-            return self.database_url_override
-        return (
+        url = self.database_url_override or (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+        # Normalise scheme — Render's built-in DB gives postgres:// or postgresql://
+        if url.startswith("postgres://"):
+            url = "postgresql+asyncpg://" + url[len("postgres://"):]
+        elif url.startswith("postgresql://"):
+            url = "postgresql+asyncpg://" + url[len("postgresql://"):]
+        return url
 
     @property
     def sync_database_url(self) -> str:
