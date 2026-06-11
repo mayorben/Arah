@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.database import engine, Base
 from core.config import get_settings
-from routers import auth, products, customers, orders, inventory, invoices, analytics, whatsapp, ai_content
+from routers import auth, products, customers, orders, inventory, invoices, analytics, whatsapp, ai_content, payments
 
 settings = get_settings()
 
@@ -59,6 +59,7 @@ app.include_router(invoices.router)
 app.include_router(analytics.router)
 app.include_router(whatsapp.router)
 app.include_router(ai_content.router)
+app.include_router(payments.router)
 
 
 @app.get("/health")
