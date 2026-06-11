@@ -71,7 +71,7 @@ interface Product {
 }
 
 const WA_SVG = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
   </svg>
 );
@@ -88,6 +88,8 @@ const HeartIcon = ({ filled, size = 16 }: { filled: boolean; size?: number }) =>
   </svg>
 );
 
+const ITEMS_PER_PAGE = 10;
+
 export default function Storefront() {
   const [products, setProducts]     = useState<Product[]>([]);
   const [loading, setLoading]       = useState(true);
@@ -96,12 +98,16 @@ export default function Storefront() {
   const [favorites, setFavorites]   = useState<Set<string>>(new Set());
   const [favsReady, setFavsReady]   = useState(false);
   const [slide, setSlide]           = useState(0);
-  const [activeCat, setActiveCat]   = useState('All');
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [activeCat, setActiveCatState] = useState('All');
+  const [page, setPage]             = useState(1);
+  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
   const productsRef = useRef<HTMLDivElement>(null);
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
   const waHref   = `https://wa.me/${waNumber}?text=Hi!%20I%20want%20to%20place%20an%20order.`;
+
+  // Reset to page 1 whenever filter changes
+  const setActiveCat = (cat: string) => { setActiveCatState(cat); setPage(1); };
 
   useEffect(() => {
     try {
@@ -162,9 +168,17 @@ export default function Storefront() {
     ? products.filter((p) => favorites.has(p.id))
     : activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
 
+  const totalPages   = Math.ceil(visible.length / ITEMS_PER_PAGE);
+  const paginated    = visible.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
   const goToFavourites = () => {
     setActiveCat('Favourite');
     productsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const changePage = (n: number) => {
+    setPage(n);
+    productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -216,13 +230,10 @@ export default function Storefront() {
           <p style={{ color: 'rgba(255,255,255,.7)', fontSize: 15, maxWidth: 380, lineHeight: 1.72, fontWeight: 300 }}>
             Rice, beans, palm oil and everything your kitchen needs — sourced with care, packed with pride.
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginTop: 34 }}>
+          <div style={{ marginTop: 34 }}>
             <a href="#products" className="font-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', background: 'var(--gold)', color: 'var(--ink)', fontSize: 12, fontWeight: 600, letterSpacing: '.14em', textTransform: 'uppercase', borderRadius: 2, textDecoration: 'none' }}>
               Shop Now
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-            </a>
-            <a href={waHref} target="_blank" rel="noopener noreferrer" className="font-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 22px', background: 'transparent', color: 'white', border: '1.5px solid rgba(255,255,255,.35)', fontSize: 12, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', borderRadius: 2, textDecoration: 'none' }}>
-              {WA_SVG} <span className="wa-text">Order on WhatsApp</span>
             </a>
           </div>
         </div>
@@ -234,14 +245,12 @@ export default function Storefront() {
               <div className="slide-caption"><span>{s.caption}</span></div>
             </div>
           ))}
-
           <button className="carousel-arrow" style={{ left: 16 }} onClick={() => goToSlide(slide - 1)} aria-label="Previous">
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
           <button className="carousel-arrow" style={{ right: 16 }} onClick={() => goToSlide(slide + 1)} aria-label="Next">
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
           </button>
-
           <div className="carousel-dots">
             {SLIDES.map((_, i) => (
               <button key={i} className={`dot${slide === i ? ' active' : ''}`} onClick={() => goToSlide(i)} aria-label={`Slide ${i + 1}`} />
@@ -259,15 +268,10 @@ export default function Storefront() {
         <h2 className="font-display" style={{ fontSize: 36, fontWeight: 500, color: 'var(--green)', marginBottom: 24, letterSpacing: '-.01em' }}>Our Provisions</h2>
         <div className="image-grid">
           {GRID_ITEMS.map((g, i) => (
-            <div
-              key={i}
-              className="grid-img"
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                setActiveCat(g.category);
-                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
+            <div key={i} className="grid-img" style={{ cursor: 'pointer' }} onClick={() => {
+              setActiveCat(g.category);
+              document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               <img src={g.src} onError={(e) => { (e.target as HTMLImageElement).src = g.fallback; }} alt={g.alt} />
               <div className="grid-img-label" style={{ opacity: 1, background: 'linear-gradient(transparent, rgba(27,67,50,.82))' }}>
                 <span style={{ fontFamily: 'Josefin Sans, sans-serif', fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</span>
@@ -288,12 +292,16 @@ export default function Storefront() {
           </div>
         ) : (
           <>
-            {/* Category pills */}
+            {/* Category filter pills */}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
               {categories.map((cat) => (
-                <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}
-                  style={cat === 'Favourite' ? { display: 'flex', alignItems: 'center', gap: 5 } : undefined}>
-                  {cat === 'Favourite' && <HeartIcon filled={favCount > 0} size={12} />}
+                <button
+                  key={cat}
+                  className={`filter-pill${activeCat === cat ? ' active' : ''}`}
+                  onClick={() => setActiveCat(cat)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                >
+                  {cat === 'Favourite' && <HeartIcon filled={favCount > 0} size={11} />}
                   {cat}
                   {cat === 'Favourite' && favCount > 0 && (
                     <span style={{ background: '#E53E3E', color: 'white', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{favCount}</span>
@@ -303,83 +311,89 @@ export default function Storefront() {
             </div>
 
             {/* Product grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }} className="product-grid-responsive">
-              {visible.map((p) => {
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="product-grid-responsive">
+              {paginated.map((p) => {
                 const outOfStock = p.stock_quantity <= 0;
                 const lowStock   = !outOfStock && p.stock_quantity < 6;
                 const atCartMax  = (cart[p.id] || 0) >= p.stock_quantity;
 
                 return (
-                  <div key={p.id} className="taeillo-card">
+                  <div key={p.id} className="card">
 
                     {/* ── IMAGE ── */}
-                    <div className="taeillo-img-wrap">
+                    <div style={{ height: 200, position: 'relative', overflow: 'hidden', background: 'var(--cream)' }}>
                       {p.image_url ? (
-                        <img src={p.image_url} alt={p.name} className="taeillo-img" />
+                        <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform .4s ease' }} className="card-img" />
                       ) : (
-                        <div className="taeillo-img-placeholder">
-                          <span className="font-display" style={{ fontSize: 52, color: 'var(--gold)', opacity: .45 }}>{p.name.charAt(0)}</span>
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span className="font-display" style={{ fontSize: 48, color: 'var(--gold)' }}>{p.name.charAt(0)}</span>
                         </div>
                       )}
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%)' }} />
 
                       {/* Out of stock overlay */}
                       {outOfStock && (
-                        <div className="taeillo-oos-overlay">
-                          <span className="taeillo-oos-badge">Out of Stock</span>
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,.68)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ background: '#111', color: '#fff', fontSize: 10, fontWeight: 700, letterSpacing: '.2em', textTransform: 'uppercase', padding: '6px 16px', borderRadius: 2, fontFamily: 'Josefin Sans, sans-serif' }}>Out of Stock</span>
                         </div>
                       )}
 
-                      {/* Low stock badge on image */}
+                      {/* Low stock badge */}
                       {lowStock && (
-                        <span className="taeillo-lowstock-badge">
+                        <span style={{ position: 'absolute', bottom: 10, left: 10, background: '#FEF3C7', color: '#92400E', fontSize: 10, fontWeight: 700, letterSpacing: '.08em', padding: '3px 10px', borderRadius: 999, border: '1px solid #FCD34D', fontFamily: 'Josefin Sans, sans-serif' }}>
                           Only {Math.floor(p.stock_quantity)} left
                         </span>
                       )}
 
-                      {/* Featured */}
+                      {/* Featured badge */}
                       {p.is_featured && !outOfStock && (
-                        <span className="font-label taeillo-featured-badge">Featured</span>
+                        <span className="font-label" style={{ position: 'absolute', top: 12, left: 12, background: 'var(--green)', color: 'white', fontSize: 8, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 2 }}>
+                          Featured
+                        </span>
                       )}
 
-                      {/* Heart */}
+                      {/* Heart button */}
                       <button
                         onClick={() => toggleFavorite(p.id)}
                         title={favorites.has(p.id) ? 'Remove from favourites' : 'Add to favourites'}
-                        className="taeillo-heart-btn"
+                        style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,.93)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,.15)', zIndex: 2 }}
                       >
                         <HeartIcon filled={favorites.has(p.id)} size={15} />
                       </button>
                     </div>
 
                     {/* ── INFO ── */}
-                    <div className="taeillo-info">
-                      <p className="taeillo-category">{p.category}</p>
-                      <h3 className="taeillo-name font-display">{p.name}</h3>
+                    <div style={{ padding: '18px 20px 20px' }}>
+                      <p className="font-label" style={{ fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6, fontWeight: 600 }}>{p.category}</p>
+                      <h3 className="font-display" style={{ fontSize: 20, fontWeight: 500, marginBottom: 6, color: 'var(--ink)', lineHeight: 1.2, letterSpacing: '.01em' }}>{p.name}</h3>
                       {p.short_description && (
-                        <p className="taeillo-desc">{p.short_description}</p>
+                        <p style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 16, fontWeight: 300 }}>{p.short_description}</p>
                       )}
 
-                      <div className="taeillo-bottom">
-                        <div className="taeillo-price-row">
-                          <span className="font-display taeillo-price">{naira(p.sale_price)}</span>
-                          <span className="taeillo-unit">/ {p.unit}</span>
+                      {/* Price + CTA row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: p.short_description ? 0 : 16 }}>
+                        <div>
+                          <span className="font-display" style={{ fontWeight: 600, fontSize: 20, color: 'var(--green)', letterSpacing: '.01em' }}>{naira(p.sale_price)}</span>
+                          <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 4, fontWeight: 300 }}>/ {p.unit}</span>
                         </div>
 
                         {outOfStock ? (
-                          <div className="taeillo-oos-label">Out of Stock</div>
+                          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#9CA3AF', fontFamily: 'Josefin Sans, sans-serif' }}>
+                            Out of Stock
+                          </span>
                         ) : cart[p.id] ? (
-                          <div className="taeillo-stepper">
-                            <button onClick={() => removeFromCart(p.id)} className="taeillo-step-btn taeillo-step-minus">−</button>
-                            <span className="taeillo-step-count">{cart[p.id]}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={() => removeFromCart(p.id)} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--green)', background: 'transparent', color: 'var(--green)', fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>−</button>
+                            <span style={{ fontWeight: 700, fontSize: 14, minWidth: 16, textAlign: 'center' }}>{cart[p.id]}</span>
                             <button
                               onClick={() => addToCart(p.id, p.stock_quantity)}
                               disabled={atCartMax}
-                              className={`taeillo-step-btn taeillo-step-plus${atCartMax ? ' disabled' : ''}`}
+                              style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--green)', background: atCartMax ? '#9CA3AF' : 'var(--green)', color: 'white', fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: atCartMax ? 'not-allowed' : 'pointer' }}
                             >+</button>
                           </div>
                         ) : (
-                          <button onClick={() => addToCart(p.id, p.stock_quantity)} className="taeillo-add-btn font-label">
-                            Add to Cart
+                          <button onClick={() => addToCart(p.id, p.stock_quantity)} className="font-label" style={{ padding: '8px 18px', background: 'var(--green)', color: 'white', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', borderRadius: 2, border: 'none', cursor: 'pointer' }}>
+                            Add
                           </button>
                         )}
                       </div>
@@ -396,14 +410,61 @@ export default function Storefront() {
                 </div>
               )}
             </div>
+
+            {/* ── PAGINATION ── */}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 48 }}>
+                <button
+                  onClick={() => changePage(page - 1)}
+                  disabled={page === 1}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: page === 1 ? '#E5E0D5' : 'var(--green)', color: page === 1 ? '#9CA3AF' : 'white', border: 'none', borderRadius: 2, fontSize: 11, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', cursor: page === 1 ? 'not-allowed' : 'pointer', fontFamily: 'Josefin Sans, sans-serif', transition: 'background .18s' }}
+                >
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                  Prev
+                </button>
+
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => changePage(n)}
+                      style={{ width: 36, height: 36, borderRadius: 2, border: n === page ? 'none' : '1.5px solid #E5E0D5', background: n === page ? 'var(--green)' : 'white', color: n === page ? 'white' : 'var(--ink)', fontSize: 13, fontWeight: n === page ? 700 : 400, cursor: 'pointer', transition: 'all .15s' }}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => changePage(page + 1)}
+                  disabled={page === totalPages}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: page === totalPages ? '#E5E0D5' : 'var(--green)', color: page === totalPages ? '#9CA3AF' : 'white', border: 'none', borderRadius: 2, fontSize: 11, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', cursor: page === totalPages ? 'not-allowed' : 'pointer', fontFamily: 'Josefin Sans, sans-serif', transition: 'background .18s' }}
+                >
+                  Next
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            )}
+
+            {/* Page counter */}
+            {totalPages > 1 && (
+              <p style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: 'var(--muted)', fontWeight: 300 }}>
+                Page {page} of {totalPages} · {visible.length} products
+              </p>
+            )}
           </>
         )}
       </div>
 
-      {/* ── WHATSAPP FLOAT ── */}
-      <a href={waHref} target="_blank" rel="noopener noreferrer" style={{ position: 'fixed', bottom: 32, left: 32, background: '#25D366', color: 'white', padding: '14px 22px', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 28px rgba(37,211,102,.4)', zIndex: 100, textDecoration: 'none' }} className="font-label wa-float">
+      {/* ── WHATSAPP FLOAT — icon only, always ── */}
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Order on WhatsApp"
+        style={{ position: 'fixed', bottom: 32, left: 32, background: '#25D366', color: 'white', width: 52, height: 52, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 24px rgba(37,211,102,.45)', zIndex: 100, textDecoration: 'none' }}
+      >
         {WA_SVG}
-        <span className="wa-text" style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase' }}>Order on WhatsApp</span>
       </a>
 
       {/* ── CART FLOAT ── */}
@@ -421,258 +482,18 @@ export default function Storefront() {
       </footer>
 
       <style>{`
-        /* ── Taeillo-inspired product card ── */
-        .taeillo-card {
-          background: #fff;
-          border: 1px solid #EDEAE3;
-          border-radius: 4px;
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-          transition: box-shadow .25s, transform .25s;
-        }
-        .taeillo-card:hover {
-          box-shadow: 0 8px 32px rgba(27,67,50,.12);
-          transform: translateY(-2px);
-        }
+        .card-img { transition: transform .4s ease; }
+        .card:hover .card-img { transform: scale(1.03); }
 
-        /* image */
-        .taeillo-img-wrap {
-          position: relative;
-          height: 240px;
-          background: #F5F3EE;
-          overflow: hidden;
-        }
-        .taeillo-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform .45s ease;
-        }
-        .taeillo-card:hover .taeillo-img { transform: scale(1.04); }
-        .taeillo-img-placeholder {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #F5F3EE;
-        }
-
-        /* out of stock overlay */
-        .taeillo-oos-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(255,255,255,.72);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .taeillo-oos-badge {
-          background: #1a1a1a;
-          color: #fff;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: .2em;
-          text-transform: uppercase;
-          padding: 7px 18px;
-          border-radius: 2px;
-          font-family: 'Josefin Sans', sans-serif;
-        }
-
-        /* low stock pill on image */
-        .taeillo-lowstock-badge {
-          position: absolute;
-          bottom: 10px;
-          left: 12px;
-          background: #FEF3C7;
-          color: #92400E;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: .1em;
-          text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: 999px;
-          font-family: 'Josefin Sans', sans-serif;
-          border: 1px solid #FCD34D;
-        }
-
-        /* featured badge */
-        .taeillo-featured-badge {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          background: var(--green);
-          color: #fff;
-          font-size: 8px;
-          font-weight: 700;
-          letter-spacing: .16em;
-          text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: 2px;
-        }
-
-        /* heart */
-        .taeillo-heart-btn {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: rgba(255,255,255,.95);
-          border: none;
-          border-radius: 50%;
-          width: 34px;
-          height: 34px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 1px 5px rgba(0,0,0,.14);
-          z-index: 2;
-          transition: transform .15s;
-        }
-        .taeillo-heart-btn:hover { transform: scale(1.12); }
-
-        /* info area */
-        .taeillo-info {
-          padding: 16px 18px 20px;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          gap: 4px;
-        }
-        .taeillo-category {
-          font-size: 9px;
-          letter-spacing: .22em;
-          text-transform: uppercase;
-          color: #9CA3AF;
-          font-weight: 700;
-          font-family: 'Josefin Sans', sans-serif;
-          margin: 0;
-        }
-        .taeillo-name {
-          font-size: 19px;
-          font-weight: 500;
-          color: #111;
-          line-height: 1.22;
-          margin: 0;
-          letter-spacing: .01em;
-        }
-        .taeillo-desc {
-          font-size: 12.5px;
-          color: #6B7280;
-          line-height: 1.58;
-          margin: 4px 0 0;
-          font-weight: 300;
-          flex: 1;
-        }
-
-        /* bottom row */
-        .taeillo-bottom {
-          margin-top: 16px;
-          padding-top: 14px;
-          border-top: 1px solid #F0EEEA;
-        }
-        .taeillo-price-row {
-          display: flex;
-          align-items: baseline;
-          gap: 5px;
-          margin-bottom: 12px;
-        }
-        .taeillo-price {
-          font-weight: 600;
-          font-size: 20px;
-          color: var(--green);
-          letter-spacing: .01em;
-        }
-        .taeillo-unit {
-          font-size: 11px;
-          color: #9CA3AF;
-          font-weight: 300;
-        }
-
-        /* OOS label (in info, below price) */
-        .taeillo-oos-label {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: .12em;
-          text-transform: uppercase;
-          color: #9CA3AF;
-          font-family: 'Josefin Sans', sans-serif;
-        }
-
-        /* Add to Cart button */
-        .taeillo-add-btn {
-          width: 100%;
-          padding: 11px 0;
-          background: var(--green);
-          color: #fff;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: .14em;
-          text-transform: uppercase;
-          border: none;
-          border-radius: 2px;
-          cursor: pointer;
-          transition: background .18s, opacity .18s;
-        }
-        .taeillo-add-btn:hover { background: #145a32; }
-
-        /* qty stepper */
-        .taeillo-stepper {
-          display: flex;
-          align-items: center;
-          gap: 0;
-          width: 100%;
-          border: 1.5px solid var(--green);
-          border-radius: 2px;
-          overflow: hidden;
-        }
-        .taeillo-step-btn {
-          flex: 0 0 40px;
-          height: 38px;
-          background: transparent;
-          border: none;
-          color: var(--green);
-          font-size: 18px;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background .15s;
-        }
-        .taeillo-step-btn:hover:not(.disabled) { background: rgba(27,67,50,.07); }
-        .taeillo-step-btn.taeillo-step-plus {
-          background: var(--green);
-          color: #fff;
-        }
-        .taeillo-step-btn.taeillo-step-plus:hover:not(.disabled) { background: #145a32; }
-        .taeillo-step-btn.disabled {
-          opacity: .35;
-          cursor: not-allowed;
-        }
-        .taeillo-step-count {
-          flex: 1;
-          text-align: center;
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--green);
-        }
-
-        /* filter pill overrides */
-        .filter-pill { display: inline-flex; align-items: center; }
-
-        /* responsive */
         @media (max-width: 900px) {
           .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 640px) {
-          .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
-          .wa-text { display: none; }
-          .taeillo-img-wrap { height: 180px; }
-          .taeillo-name { font-size: 16px; }
-          .taeillo-price { font-size: 17px; }
+          .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+          nav { padding: 14px 16px !important; }
+        }
+        @media (max-width: 400px) {
+          .product-grid-responsive { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
