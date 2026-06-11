@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { ServiceWorker } from '@/components/ServiceWorker';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ServiceWorker />
+        <PWAInstallPrompt />
         {children}
       </body>
     </html>
