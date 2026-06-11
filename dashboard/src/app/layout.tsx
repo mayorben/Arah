@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
       { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
     ],
-    shortcut: '/icons/icon-192x192.png',
+    shortcut: '/favicon.ico',
   },
 };
 
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         {/* Extra PWA / iOS meta that Next.js Metadata API doesn't cover */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Arah" />
