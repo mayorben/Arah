@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     bank_account_number: str = ""
     bank_account_name: str = ""
 
+    # Paystack
+    paystack_secret_key: str = ""   # sk_live_... or sk_test_...
+
     # Low stock
     default_low_stock_threshold: int = 10
 
