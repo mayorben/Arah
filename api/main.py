@@ -57,3 +57,11 @@ app.include_router(ai_content.router)
 @app.get("/health")
 async def health():
     return {"status": "ok", "app": settings.app_name}
+
+
+@app.post("/admin/seed", dependencies=[])
+async def run_seed():
+    """One-time endpoint to seed the database with starter products."""
+    from seed import seed
+    await seed()
+    return {"status": "ok", "message": "Seed complete"}
