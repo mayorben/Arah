@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from core.database import get_db
 from core.security import get_current_admin
 from models.product import Product
-from services.minio_client import upload_bytes, get_public_url, ensure_buckets
+from services.storage_client import upload_bytes, get_public_url, ensure_buckets
 from core.config import get_settings
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -127,7 +127,7 @@ async def upload_image(product_id: str, file: UploadFile = File(...), db: AsyncS
     ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else "jpg"
     key = f"{product_id}/thumbnail.{ext}"
     ensure_buckets()
-    upload_bytes(settings.minio_bucket_products, key, data, f"image/{ext}")
-    p.image_url = get_public_url(settings.minio_bucket_products, key)
+    upload_bytes(settings.storage_bucket_products, key, data, f"image/{ext}")
+    p.image_url = get_public_url(settings.storage_bucket_products, key)
     await db.commit()
     return {"image_url": p.image_url}

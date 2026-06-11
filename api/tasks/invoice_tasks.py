@@ -13,7 +13,7 @@ def generate_and_send_invoice(self, invoice_id: str):
     from models.order import Order
     from models.customer import Customer
     from services.invoice_pdf import render_invoice
-    from services.minio_client import upload_bytes, ensure_buckets
+    from services.storage_client import upload_bytes, ensure_buckets
     from services.whatsapp_client import send_text
     from core.config import get_settings
 
@@ -38,7 +38,7 @@ def generate_and_send_invoice(self, invoice_id: str):
 
             # Upload to MinIO
             ensure_buckets()
-            upload_bytes(settings.minio_bucket_invoices, key, pdf_bytes, "application/pdf")
+            upload_bytes(settings.storage_bucket_invoices, key, pdf_bytes, "application/pdf")
 
             # Streaming endpoint URL — works without presigned URL hostname issues
             pdf_link = f"{settings.base_url}/api/invoices/{invoice_id}/pdf"

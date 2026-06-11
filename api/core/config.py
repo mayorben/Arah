@@ -13,12 +13,14 @@ class Settings(BaseSettings):
     environment: str = "development"
     base_url: str = "http://localhost"
 
-    # Admin credentials (single owner login)
+    # Admin credentials
     admin_username: str = "admin"
     admin_password: str = "changeme"
 
-    # PostgreSQL
-    postgres_host: str = "db"
+    # PostgreSQL — set DATABASE_URL_OVERRIDE to a full Supabase pooler string,
+    # or fill individual fields for a local postgres instance.
+    database_url_override: str = ""
+    postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_db: str = "arah"
     postgres_user: str = "arah"
@@ -26,6 +28,8 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        if self.database_url_override:
+            return self.database_url_override
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
@@ -33,21 +37,24 @@ class Settings(BaseSettings):
 
     @property
     def sync_database_url(self) -> str:
-        return (
-            f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
+        url = self.database_url_override or (
+            f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+        return (
+            url
+            .replace("postgresql+asyncpg://", "postgresql+psycopg2://")
+            .replace("postgresql://", "postgresql+psycopg2://")
+        )
 
-    # Redis
-    redis_url: str = "redis://redis:6379/0"
+    # Redis — Upstash gives a rediss:// URL; locally use redis://localhost:6379/0
+    redis_url: str = "redis://localhost:6379/0"
 
-    # MinIO
-    minio_endpoint: str = "minio:9000"
-    minio_root_user: str = "minioadmin"
-    minio_root_password: str = "changeme123"
-    minio_bucket_invoices: str = "invoices"
-    minio_bucket_products: str = "products"
-    minio_public_url: str = "http://localhost/storage"
+    # Supabase Storage (replaces MinIO)
+    supabase_url: str = ""
+    supabase_service_key: str = ""
+    storage_bucket_invoices: str = "invoices"
+    storage_bucket_products: str = "products"
 
     # WhatsApp Cloud API
     whatsapp_phone_number_id: str = ""

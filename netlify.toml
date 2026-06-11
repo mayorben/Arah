@@ -1,0 +1,19 @@
+# Netlify deployment configuration for the Next.js dashboard.
+# Connect this repo in the Netlify dashboard, then set these environment variables
+# under Site Settings → Environment Variables:
+#
+#   NEXT_PUBLIC_API_URL          https://arah-api.onrender.com   (your Render URL)
+#   NEXT_PUBLIC_APP_NAME         Arah Provisions
+#   NEXT_PUBLIC_OWNER_WHATSAPP   2348012345678
+
+[build]
+  base    = "dashboard"
+  command = "npm install --legacy-peer-deps && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION            = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
