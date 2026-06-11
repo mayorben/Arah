@@ -28,6 +28,7 @@ export default function ProductsPage() {
   // add-product modal
   const [showAdd, setShowAdd]   = useState(false);
   const [form, setForm]         = useState({ ...emptyForm });
+  const [addErrors, setAddErrors] = useState({ name: '', sale_price: '', cost_price: '' });
   const [adding, setAdding]     = useState(false);
 
   // AI studio
@@ -51,12 +52,36 @@ export default function ProductsPage() {
   }, [products, search]);
 
   // ── Add Product ──────────────────────────────────────────────────────────
-  const field = (key: string, value: string | boolean) =>
+  const field = (key: string, value: string | boolean) => {
     setForm((f) => ({ ...f, [key]: value }));
+    if (key in addErrors) setAddErrors((e) => ({ ...e, [key]: '' }));
+  };
+
+  const validateAdd = (): boolean => {
+    const next = { name: '', sale_price: '', cost_price: '' };
+    let ok = true;
+    if (!form.name.trim() || form.name.trim().length < 2) {
+      next.name = 'Product name is required (min 2 characters)';
+      ok = false;
+    }
+    const price = parseFloat(form.sale_price as string);
+    if (!form.sale_price || isNaN(price) || price <= 0) {
+      next.sale_price = 'Enter a valid sale price greater than 0';
+      ok = false;
+    }
+    if (form.cost_price) {
+      const cost = parseFloat(form.cost_price as string);
+      if (isNaN(cost) || cost <= 0) {
+        next.cost_price = 'Cost price must be greater than 0';
+        ok = false;
+      }
+    }
+    setAddErrors(next);
+    return ok;
+  };
 
   const submitAdd = async () => {
-    if (!form.name.trim()) { toast.error('Product name is required'); return; }
-    if (!form.sale_price)  { toast.error('Sale price is required');   return; }
+    if (!validateAdd()) return;
     setAdding(true);
     try {
       await api.post('/products', {
@@ -225,7 +250,7 @@ export default function ProductsPage() {
                 <h2 className="font-serif text-xl font-bold text-white">Add New Product</h2>
                 <p className="text-xs mt-0.5" style={{ color: '#C9A84C' }}>Fill in the details below to list a new product</p>
               </div>
-              <button onClick={() => setShowAdd(false)} className="text-white/70 hover:text-white">
+              <button onClick={() => { setShowAdd(false); setAddErrors({ name: '', sale_price: '', cost_price: '' }); }} className="text-white/70 hover:text-white">
                 <X size={20} />
               </button>
             </div>
@@ -240,7 +265,9 @@ export default function ProductsPage() {
                     Product Name <span className="text-red-400">*</span>
                   </label>
                   <input value={form.name} onChange={(e) => field('name', e.target.value)}
-                    placeholder="e.g. Local Brown Rice" className={inp} style={{ borderColor: '#E5E0D5' }} />
+                    placeholder="e.g. Local Brown Rice" className={inp}
+                    style={{ borderColor: addErrors.name ? '#EF4444' : '#E5E0D5' }} />
+                  {addErrors.name && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{addErrors.name}</p>}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#6B7280' }}>Category</label>
@@ -260,13 +287,17 @@ export default function ProductsPage() {
                   </label>
                   <input type="number" min="0" step="0.01" value={form.sale_price}
                     onChange={(e) => field('sale_price', e.target.value)}
-                    placeholder="4500" className={inp} style={{ borderColor: '#E5E0D5' }} />
+                    placeholder="4500" className={inp}
+                    style={{ borderColor: addErrors.sale_price ? '#EF4444' : '#E5E0D5' }} />
+                  {addErrors.sale_price && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{addErrors.sale_price}</p>}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#6B7280' }}>Cost Price (₦)</label>
                   <input type="number" min="0" step="0.01" value={form.cost_price}
                     onChange={(e) => field('cost_price', e.target.value)}
-                    placeholder="3200 (optional)" className={inp} style={{ borderColor: '#E5E0D5' }} />
+                    placeholder="3200 (optional)" className={inp}
+                    style={{ borderColor: addErrors.cost_price ? '#EF4444' : '#E5E0D5' }} />
+                  {addErrors.cost_price && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{addErrors.cost_price}</p>}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#6B7280' }}>Unit</label>
@@ -329,7 +360,7 @@ export default function ProductsPage() {
 
             {/* footer */}
             <div className="p-5 border-t flex gap-3 justify-end" style={{ borderColor: '#E5E0D5' }}>
-              <button onClick={() => setShowAdd(false)}
+              <button onClick={() => { setShowAdd(false); setAddErrors({ name: '', sale_price: '', cost_price: '' }); }}
                 className="px-5 py-2.5 text-sm border rounded-sm" style={{ borderColor: '#E5E0D5' }}>
                 Cancel
               </button>

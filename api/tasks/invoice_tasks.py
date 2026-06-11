@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ def generate_and_send_invoice(self, invoice_id: str):
     from models.customer import Customer
     from services.invoice_pdf import render_invoice
     from services.storage_client import upload_bytes, ensure_buckets
-    from services.whatsapp_client import send_text
+    from services.whatsapp_client import send_text, send_document_link
     from core.config import get_settings
 
     settings = get_settings()
@@ -36,11 +36,11 @@ def generate_and_send_invoice(self, invoice_id: str):
             month = datetime.now(timezone.utc).strftime("%m")
             key = f"{year}/{month}/{invoice.invoice_number}.pdf"
 
-            # Upload to MinIO
+            # Upload to storage
             ensure_buckets()
             upload_bytes(settings.storage_bucket_invoices, key, pdf_bytes, "application/pdf")
 
-            # Streaming endpoint URL — works without presigned URL hostname issues
+            # Streaming endpoint URL for document delivery
             pdf_link = f"{settings.base_url}/api/invoices/{invoice_id}/pdf"
 
             # Update invoice record
@@ -49,15 +49,27 @@ def generate_and_send_invoice(self, invoice_id: str):
             invoice.status = "sent"
             db.commit()
 
-            # Send via WhatsApp if customer has a WhatsApp ID
+            # Send WhatsApp messages if customer has a WhatsApp ID
             if customer.whatsapp_id:
-                msg = (
-                    f"📄 *Invoice Ready — {settings.business_name}*\n\n"
-                    f"Order: *{order.order_number}*\n"
-                    f"Total: *₦{float(order.total_amount):,.2f}*\n\n"
-                    f"Download your invoice here:\n{pdf_link}"
+                delivery_date = (datetime.now(timezone.utc) + timedelta(days=4)).strftime("%b %d, %Y")
+                confirmation_msg = (
+                    f"*Order confirmed* ✅\n\n"
+                    f"Hi {customer.full_name},\n\n"
+                    f"Thank you for your purchase! Your order number is *{order.order_number}*.\n\n"
+                    f"We'll start getting your farm fresh groceries ready to ship.\n\n"
+                    f"Estimated delivery: {delivery_date}.\n\n"
+                    f"We will let you know when your order ships."
                 )
-                send_text(to=customer.whatsapp_id, message=msg)
+                send_text(to=customer.whatsapp_id, message=confirmation_msg)
+
+                # Send PDF invoice as document attachment
+                send_document_link(
+                    to=customer.whatsapp_id,
+                    url=pdf_link,
+                    caption=f"Invoice {invoice.invoice_number} — {settings.business_name}",
+                    filename=f"{invoice.invoice_number}.pdf",
+                )
+
                 invoice.whatsapp_sent = True
                 invoice.whatsapp_sent_at = datetime.now(timezone.utc)
                 db.commit()

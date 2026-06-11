@@ -47,6 +47,7 @@ export default function OrderPage() {
   const [items, setItems]               = useState<CartItem[]>([]);
   const [loading, setLoading]           = useState(true);
   const [form, setForm]                 = useState({ name: '', phone: '', email: '', address: '', city: '' });
+  const [errors, setErrors]             = useState({ name: '', phone: '', email: '' });
   const [submitting, setSubmitting]     = useState(false);
   const [paystackReady, setPaystackReady] = useState(false);
   const pendingOrderRef = useRef<{ order_number: string } | null>(null);
@@ -143,9 +144,41 @@ export default function OrderPage() {
     handler.openIframe();
   };
 
+  // ── Validation ────────────────────────────────────────────────────────────
+  const validate = (): boolean => {
+    const next = { name: '', phone: '', email: '' };
+    let ok = true;
+
+    if (!form.name.trim() || form.name.trim().length < 2) {
+      next.name = 'Please enter your full name (at least 2 characters)';
+      ok = false;
+    }
+
+    const rawPhone = form.phone.replace(/\s+/g, '');
+    const nigerianPhone = /^(0[789][01]\d{8}|\+?234[789][01]\d{8})$/;
+    if (!rawPhone) {
+      next.phone = 'Phone number is required';
+      ok = false;
+    } else if (!nigerianPhone.test(rawPhone)) {
+      next.phone = 'Enter a valid Nigerian number (e.g. 08012345678 or +2348012345678)';
+      ok = false;
+    }
+
+    if (form.email.trim()) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!emailRe.test(form.email.trim())) {
+        next.email = 'Enter a valid email address';
+        ok = false;
+      }
+    }
+
+    setErrors(next);
+    return ok;
+  };
+
   // ── Main submit: create order then open Paystack ──────────────────────────
   const submit = async () => {
-    if (!form.name || !form.phone) { toast.error('Name and phone are required'); return; }
+    if (!validate()) return;
     if (!items.length) { toast.error('Your cart is empty'); return; }
 
     if (PAYSTACK_KEY && !paystackReady) {
@@ -244,13 +277,26 @@ export default function OrderPage() {
           {/* Name */}
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#6B7280', marginBottom: 6 }}>Full Name *</label>
-            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} style={inp} placeholder="e.g. Chisom Okafor" />
+            <input
+              value={form.name}
+              onChange={(e) => { setForm((f) => ({ ...f, name: e.target.value })); setErrors((er) => ({ ...er, name: '' })); }}
+              style={{ ...inp, borderColor: errors.name ? '#EF4444' : '#E5E0D5' }}
+              placeholder="e.g. Chisom Okafor"
+            />
+            {errors.name && <p style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>{errors.name}</p>}
           </div>
 
           {/* Phone */}
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#6B7280', marginBottom: 6 }}>WhatsApp / Phone *</label>
-            <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} style={inp} placeholder="08012345678" inputMode="tel" />
+            <input
+              value={form.phone}
+              onChange={(e) => { setForm((f) => ({ ...f, phone: e.target.value })); setErrors((er) => ({ ...er, phone: '' })); }}
+              style={{ ...inp, borderColor: errors.phone ? '#EF4444' : '#E5E0D5' }}
+              placeholder="08012345678"
+              inputMode="tel"
+            />
+            {errors.phone && <p style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>{errors.phone}</p>}
           </div>
 
           {/* Email */}
@@ -259,7 +305,14 @@ export default function OrderPage() {
               <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#6B7280', marginBottom: 6 }}>
                 Email <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — for payment receipt)</span>
               </label>
-              <input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} style={inp} placeholder="you@email.com" />
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => { setForm((f) => ({ ...f, email: e.target.value })); setErrors((er) => ({ ...er, email: '' })); }}
+                style={{ ...inp, borderColor: errors.email ? '#EF4444' : '#E5E0D5' }}
+                placeholder="you@email.com"
+              />
+              {errors.email && <p style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>{errors.email}</p>}
             </div>
           )}
 
