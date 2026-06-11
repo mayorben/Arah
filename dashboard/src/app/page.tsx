@@ -100,14 +100,18 @@ export default function Storefront() {
   const [slide, setSlide]           = useState(0);
   const [activeCat, setActiveCatState] = useState('All');
   const [page, setPage]             = useState(1);
-  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const productsRef = useRef<HTMLDivElement>(null);
+  const timerRef     = useRef<ReturnType<typeof setInterval> | null>(null);
+  const provTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const productsRef  = useRef<HTMLDivElement>(null);
+  const [provSlide, setProvSlide] = useState(0);
+  const [search, setSearch]       = useState('');
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
   const waHref   = `https://wa.me/${waNumber}?text=Hi!%20I%20want%20to%20place%20an%20order.`;
 
   // Reset to page 1 whenever filter changes
-  const setActiveCat = (cat: string) => { setActiveCatState(cat); setPage(1); };
+  const setActiveCat = (cat: string) => { setActiveCatState(cat); setPage(1); setSearch(''); };
+  const updateSearch = (q: string) => { setSearch(q); setPage(1); };
 
   useEffect(() => {
     try {
@@ -147,6 +151,17 @@ export default function Storefront() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
+  const goToProvSlide = useCallback((n: number) => {
+    setProvSlide((n + GRID_ITEMS.length) % GRID_ITEMS.length);
+    if (provTimerRef.current) clearInterval(provTimerRef.current);
+    provTimerRef.current = setInterval(() => setProvSlide((s) => (s + 1) % GRID_ITEMS.length), 3800);
+  }, []);
+
+  useEffect(() => {
+    provTimerRef.current = setInterval(() => setProvSlide((s) => (s + 1) % GRID_ITEMS.length), 3800);
+    return () => { if (provTimerRef.current) clearInterval(provTimerRef.current); };
+  }, []);
+
   const addToCart = (id: string, maxStock: number) =>
     setCart((c) => {
       if ((c[id] || 0) >= maxStock) return c;
@@ -164,9 +179,13 @@ export default function Storefront() {
   const extraCats = dbCats.filter((c) => !DEFAULT_CATS.includes(c));
   const categories = ['All', ...DEFAULT_CATS, ...extraCats, 'Favourite'];
 
-  const visible = activeCat === 'Favourite'
+  const baseVisible = activeCat === 'Favourite'
     ? products.filter((p) => favorites.has(p.id))
     : activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
+
+  const visible = search.trim()
+    ? baseVisible.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+    : baseVisible;
 
   const totalPages   = Math.ceil(visible.length / ITEMS_PER_PAGE);
   const paginated    = visible.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -262,23 +281,54 @@ export default function Storefront() {
       {/* ── GOLD STRIPE ── */}
       <div style={{ height: 4, background: 'var(--gold)' }} />
 
-      {/* ── IMAGE GRID ── */}
+      {/* ── OUR PROVISIONS CAROUSEL ── */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '52px 40px 0' }}>
         <p className="font-label" style={{ fontSize: 10, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 10, fontWeight: 600 }}>Sourced with care</p>
         <h2 className="font-display" style={{ fontSize: 36, fontWeight: 500, color: 'var(--green)', marginBottom: 24, letterSpacing: '-.01em' }}>Our Provisions</h2>
-        <div className="image-grid">
-          {GRID_ITEMS.map((g, i) => (
-            <div key={i} className="grid-img" style={{ cursor: 'pointer' }} onClick={() => {
-              setActiveCat(g.category);
-              document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
-              <img src={g.src} onError={(e) => { (e.target as HTMLImageElement).src = g.fallback; }} alt={g.alt} />
-              <div className="grid-img-label" style={{ opacity: 1, background: 'linear-gradient(transparent, rgba(27,67,50,.82))' }}>
-                <span style={{ fontFamily: 'Josefin Sans, sans-serif', fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</span>
-                <span style={{ display: 'block', fontSize: 9, opacity: 0.75, marginTop: 2, letterSpacing: '.1em', textTransform: 'uppercase' }}>Tap to browse →</span>
+
+        <div className="prov-carousel">
+          {/* sliding track */}
+          <div className="prov-track" style={{ transform: `translateX(-${provSlide * 100}%)` }}>
+            {GRID_ITEMS.map((g, i) => (
+              <div key={i} className="prov-slide" onClick={() => {
+                setActiveCat(g.category);
+                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                <img
+                  src={g.src}
+                  onError={(e) => { (e.target as HTMLImageElement).src = g.fallback; }}
+                  alt={g.alt}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+                <div className="prov-label">
+                  <span className="font-label" style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: 5 }}>{g.label}</span>
+                  <span style={{ fontSize: 10, opacity: 0.8, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Josefin Sans, sans-serif' }}>Tap to browse →</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* arrows */}
+          <button className="prov-arrow prov-arrow-left" onClick={() => goToProvSlide(provSlide - 1)} aria-label="Previous">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <button className="prov-arrow prov-arrow-right" onClick={() => goToProvSlide(provSlide + 1)} aria-label="Next">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+          </button>
+
+          {/* dots */}
+          <div className="prov-dots">
+            {GRID_ITEMS.map((_, i) => (
+              <button key={i} className={`prov-dot${provSlide === i ? ' active' : ''}`} onClick={() => goToProvSlide(i)} aria-label={`Category ${i + 1}`} />
+            ))}
+          </div>
+
+          {/* slide counter */}
+          <div style={{ position: 'absolute', top: 14, right: 18, zIndex: 3, background: 'rgba(0,0,0,.35)', backdropFilter: 'blur(4px)', borderRadius: 4, padding: '3px 10px' }}>
+            <span className="font-label" style={{ color: 'white', fontSize: 10, letterSpacing: '.1em' }}>
+              {provSlide + 1} / {GRID_ITEMS.length}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -292,6 +342,25 @@ export default function Storefront() {
           </div>
         ) : (
           <>
+            {/* Search bar */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ position: 'relative', maxWidth: 380 }}>
+                <svg width="15" height="15" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                  <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => updateSearch(e.target.value)}
+                  placeholder="Search products…"
+                  style={{ width: '100%', padding: '10px 40px', border: '1.5px solid var(--border)', borderRadius: 999, fontSize: 13, outline: 'none', background: 'white', boxSizing: 'border-box', fontFamily: 'DM Sans, sans-serif' }}
+                />
+                {search && (
+                  <button onClick={() => updateSearch('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 2, lineHeight: 1, fontSize: 16 }}>✕</button>
+                )}
+              </div>
+            </div>
+
             {/* Category filter pills */}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
               {categories.map((cat) => (
