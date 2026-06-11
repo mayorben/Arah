@@ -236,7 +236,7 @@ export default function Storefront() {
                         Featured
                       </span>
                     )}
-                    {p.stock_quantity <= 0 && (
+                    {p.stock_quantity < 0 && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ color: 'white', fontWeight: 600 }}>Out of Stock</span>
                       </div>
@@ -254,7 +254,7 @@ export default function Storefront() {
                         <span className="font-display" style={{ fontWeight: 600, fontSize: 20, color: 'var(--green)', letterSpacing: '.01em' }}>{naira(p.sale_price)}</span>
                         <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 4, fontWeight: 300 }}>/ {p.unit}</span>
                       </div>
-                      {p.stock_quantity > 0 && (
+                      {p.stock_quantity >= 0 && (
                         <div>
                           {cart[p.id] ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
