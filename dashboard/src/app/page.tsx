@@ -85,13 +85,28 @@ const CART_SVG = (
 export default function Storefront() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading]   = useState(true);
-  const [cart, setCart]         = useState<Record<string, number>>({});
-  const [slide, setSlide]       = useState(0);
+  const [cart, setCart]           = useState<Record<string, number>>({});
+  const [cartReady, setCartReady] = useState(false);
+  const [slide, setSlide]         = useState(0);
   const [activeCat, setActiveCat] = useState('All');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
   const waHref   = `https://wa.me/${waNumber}?text=Hi!%20I%20want%20to%20place%20an%20order.`;
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('arah_cart');
+      if (saved) setCart(JSON.parse(saved));
+    } catch {}
+    setCartReady(true);
+  }, []);
+
+  // Persist cart to localStorage on every change
+  useEffect(() => {
+    if (cartReady) localStorage.setItem('arah_cart', JSON.stringify(cart));
+  }, [cart, cartReady]);
 
   useEffect(() => {
     api.get('/products').then((r) => { setProducts(r.data); setLoading(false); }).catch(() => setLoading(false));
