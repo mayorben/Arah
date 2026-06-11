@@ -34,27 +34,27 @@ const GRID_ITEMS = [
   {
     src: 'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=900&q=80',
     fallback: 'https://picsum.photos/seed/ricebig/900/700',
-    alt: 'Rice', label: 'Premium Rice',
+    alt: 'Rice', label: 'Premium Rice', category: 'Grains',
   },
   {
     src: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=500&q=80',
     fallback: 'https://picsum.photos/seed/palmoil/500/320',
-    alt: 'Palm Oil', label: 'Palm Oil',
+    alt: 'Palm Oil', label: 'Palm Oil', category: 'Oils & Fats',
   },
   {
     src: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=500&q=80',
     fallback: 'https://picsum.photos/seed/beansbowl/500/320',
-    alt: 'Beans', label: 'Beans',
+    alt: 'Beans', label: 'Beans', category: 'Legumes',
   },
   {
     src: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=500&q=80',
     fallback: 'https://picsum.photos/seed/crayfish/500/320',
-    alt: 'Crayfish', label: 'Crayfish',
+    alt: 'Crayfish', label: 'Crayfish', category: 'Seasonings',
   },
   {
     src: 'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=500&q=80',
     fallback: 'https://picsum.photos/seed/garrisw/500/320',
-    alt: 'Garri', label: 'Garri & Swallow',
+    alt: 'Garri', label: 'Garri & Swallow', category: 'Swallow',
   },
 ];
 
@@ -113,7 +113,12 @@ export default function Storefront() {
     setCart((c) => { const n = { ...c }; if (n[id] > 1) n[id]--; else delete n[id]; return n; });
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const categories = ['All', ...new Set(products.map((p) => p.category).filter(Boolean))];
+
+  const DEFAULT_CATS = ['Grains', 'Legumes', 'Oils & Fats', 'Swallow', 'Seasonings'];
+  const dbCats = [...new Set(products.map((p) => p.category).filter(Boolean))];
+  const extraCats = dbCats.filter((c) => !DEFAULT_CATS.includes(c));
+  const categories = ['All', ...DEFAULT_CATS, ...extraCats];
+
   const visible = activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
 
   return (
@@ -191,9 +196,20 @@ export default function Storefront() {
         <h2 className="font-display" style={{ fontSize: 36, fontWeight: 500, color: 'var(--green)', marginBottom: 24, letterSpacing: '-.01em' }}>Our Provisions</h2>
         <div className="image-grid">
           {GRID_ITEMS.map((g, i) => (
-            <div key={i} className="grid-img">
+            <div
+              key={i}
+              className="grid-img"
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                setActiveCat(g.category);
+                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               <img src={g.src} onError={(e) => { (e.target as HTMLImageElement).src = g.fallback; }} alt={g.alt} />
-              <div className="grid-img-label">{g.label}</div>
+              <div className="grid-img-label" style={{ opacity: 1, background: 'linear-gradient(transparent, rgba(27,67,50,.82))' }}>
+                <span style={{ fontFamily: 'Josefin Sans, sans-serif', fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</span>
+                <span style={{ display: 'block', fontSize: 9, opacity: 0.75, marginTop: 2, letterSpacing: '.1em', textTransform: 'uppercase' }}>Tap to browse →</span>
+              </div>
             </div>
           ))}
         </div>
@@ -209,15 +225,13 @@ export default function Storefront() {
           </div>
         ) : (
           <>
-            {categories.length > 1 && (
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
-                {categories.map((cat) => (
-                  <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}>
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
+              {categories.map((cat) => (
+                <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}>
+                  {cat}
+                </button>
+              ))}
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="product-grid-responsive">
               {visible.map((p) => (
