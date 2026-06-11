@@ -89,8 +89,11 @@ async def create_product(data: ProductCreate, db: AsyncSession = Depends(get_db)
     await db.refresh(p)
 
     if data.is_active:
-        from tasks.alert_tasks import broadcast_product_update
-        broadcast_product_update.delay(str(p.id), "new_product")
+        try:
+            from tasks.alert_tasks import broadcast_product_update
+            broadcast_product_update.delay(str(p.id), "new_product")
+        except Exception:
+            pass
 
     return _product_dict(p)
 

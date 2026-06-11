@@ -68,6 +68,9 @@ async def resend_invoice(invoice_id: str, db: AsyncSession = Depends(get_db)):
     inv = await db.get(Invoice, uuid.UUID(invoice_id))
     if not inv:
         raise HTTPException(404, "Invoice not found")
-    from tasks.invoice_tasks import generate_and_send_invoice
-    generate_and_send_invoice.delay(str(inv.id))
+    try:
+        from tasks.invoice_tasks import generate_and_send_invoice
+        generate_and_send_invoice.delay(str(inv.id))
+    except Exception:
+        pass
     return {"ok": True, "message": "Invoice regeneration queued"}
