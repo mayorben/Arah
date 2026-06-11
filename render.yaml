@@ -1,0 +1,50 @@
+# Render deployment configuration
+# Deploy all three services from this one file via Render's "Blueprint" feature.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After connecting your repo, set these environment variables in the Render dashboard
+# (under each service → Environment) — they are the same for all three services:
+#
+#   DATABASE_URL_OVERRIDE   postgresql+asyncpg://postgres:[password]@db.[ref].supabase.co:5432/postgres
+#   REDIS_URL               rediss://default:[token]@[host].upstash.io:6379
+#   SUPABASE_URL            https://[ref].supabase.co
+#   SUPABASE_SERVICE_KEY    [your service_role key]
+#   SECRET_KEY              [random 32-char string]
+#   ADMIN_USERNAME          admin
+#   ADMIN_PASSWORD          [strong password]
+#   WHATSAPP_PHONE_NUMBER_ID
+#   WHATSAPP_ACCESS_TOKEN
+#   WHATSAPP_VERIFY_TOKEN
+#   OWNER_WHATSAPP_NUMBER
+#   BUSINESS_NAME           Arah Provisions
+#   BASE_URL                https://arah-api.onrender.com   (your Render URL)
+
+services:
+
+  # ── FastAPI Web Service ────────────────────────────────────────────────────
+  - type: web
+    name: arah-api
+    runtime: docker
+    rootDir: api
+    dockerfilePath: Dockerfile
+    dockerCommand: uvicorn main:app --host 0.0.0.0 --port 8000
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ── Celery Worker ──────────────────────────────────────────────────────────
+  - type: worker
+    name: arah-worker
+    runtime: docker
+    rootDir: api
+    dockerfilePath: Dockerfile
+    dockerCommand: celery -A tasks.celery_app worker --loglevel=info -Q default,invoices,whatsapp,alerts
+    autoDeploy: true
+
+  # ── Celery Beat Scheduler ──────────────────────────────────────────────────
+  - type: worker
+    name: arah-beat
+    runtime: docker
+    rootDir: api
+    dockerfilePath: Dockerfile
+    dockerCommand: celery -A tasks.celery_app beat --loglevel=info --scheduler celery.beat.PersistentScheduler
+    autoDeploy: true

@@ -1,0 +1,42 @@
+# Lightweight local dev stack — runs only PostgreSQL and Redis locally.
+# The API and dashboard run directly on your machine (no Docker build needed).
+#
+# Start backing services:
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Then in separate terminals:
+#   cd api   && uvicorn main:app --reload --port 8000
+#   cd api   && celery -A tasks.celery_app worker -l info
+#   cd dashboard && npm install --legacy-peer-deps && npm run dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       arah
+      POSTGRES_USER:     arah
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arah"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_dev:

@@ -33,27 +33,27 @@ async def get_download_url(invoice_id: str, db: AsyncSession = Depends(get_db)):
     inv = await db.get(Invoice, uuid.UUID(invoice_id))
     if not inv or not inv.pdf_object_key:
         raise HTTPException(404, "Invoice PDF not found")
-    from services.minio_client import get_presigned_url
+    from services.storage_client import get_public_url
     from core.config import get_settings
     settings = get_settings()
-    url = get_presigned_url(settings.minio_bucket_invoices, inv.pdf_object_key, expires_days=1)
+    url = get_public_url(settings.storage_bucket_invoices, inv.pdf_object_key)
     return {"url": url}
 
 
 @router.get("/{invoice_id}/pdf")
 async def stream_pdf(invoice_id: str, db: AsyncSession = Depends(get_db)):
-    """Public endpoint — streams the invoice PDF directly from MinIO."""
+    """Public endpoint — streams the invoice PDF from Supabase Storage."""
     try:
         inv = await db.get(Invoice, uuid.UUID(invoice_id))
     except ValueError:
         raise HTTPException(404, "Invoice not found")
     if not inv or not inv.pdf_object_key:
         raise HTTPException(404, "PDF not ready yet")
-    from services.minio_client import get_object_bytes
+    from services.storage_client import get_object_bytes
     from core.config import get_settings
     settings = get_settings()
     try:
-        data = get_object_bytes(settings.minio_bucket_invoices, inv.pdf_object_key)
+        data = get_object_bytes(settings.storage_bucket_invoices, inv.pdf_object_key)
     except Exception:
         raise HTTPException(404, "PDF not available")
     return StreamingResponse(

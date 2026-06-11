@@ -15,12 +15,12 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # Ensure MinIO buckets exist
+    # Ensure Supabase Storage buckets exist
     try:
-        from services.minio_client import ensure_buckets
+        from services.storage_client import ensure_buckets
         ensure_buckets()
     except Exception as e:
-        print(f"Warning: MinIO setup failed: {e}")
+        print(f"Warning: Storage setup failed: {e}")
 
     yield
 

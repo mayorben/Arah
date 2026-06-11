@@ -19,10 +19,19 @@ async def verify_webhook(request: Request):
 
 @router.post("/webhook")
 async def receive_webhook(request: Request):
-    # Always return 200 immediately; process asynchronously
-    body = await request.json()
+    import json
+    raw_body = await request.body()
+
+    # Reject requests that don't carry a valid Meta signature.
+    # Skip only when WHATSAPP_APP_SECRET is not yet configured (local dev).
+    if settings.whatsapp_app_secret:
+        signature = request.headers.get("X-Hub-Signature-256", "")
+        from services.whatsapp_client import verify_signature
+        if not verify_signature(raw_body, signature, settings.whatsapp_app_secret):
+            raise HTTPException(status_code=403, detail="Invalid signature")
 
     try:
+        body = json.loads(raw_body)
         entry = body.get("entry", [])
         if entry:
             changes = entry[0].get("changes", [])
