@@ -20,7 +20,6 @@
     "zustand": "^5.0.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-select": "^2.1.2",
-    "@radix-ui/react-badge": "^1.0.0",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
