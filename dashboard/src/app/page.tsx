@@ -82,8 +82,8 @@ const CART_SVG = (
   </svg>
 );
 
-const HEART_SVG = ({ filled }: { filled: boolean }) => (
-  <svg width="16" height="16" fill={filled ? '#E53E3E' : 'none'} stroke={filled ? '#E53E3E' : '#666'} strokeWidth="2" viewBox="0 0 24 24">
+const HeartIcon = ({ filled, size = 16 }: { filled: boolean; size?: number }) => (
+  <svg width={size} height={size} fill={filled ? '#E53E3E' : 'none'} stroke={filled ? '#E53E3E' : 'currentColor'} strokeWidth="2" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
   </svg>
 );
@@ -98,11 +98,11 @@ export default function Storefront() {
   const [slide, setSlide]           = useState(0);
   const [activeCat, setActiveCat]   = useState('All');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
   const waHref   = `https://wa.me/${waNumber}?text=Hi!%20I%20want%20to%20place%20an%20order.`;
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('arah_cart');
@@ -111,12 +111,10 @@ export default function Storefront() {
     setCartReady(true);
   }, []);
 
-  // Persist cart to localStorage on every change
   useEffect(() => {
     if (cartReady) localStorage.setItem('arah_cart', JSON.stringify(cart));
   }, [cart, cartReady]);
 
-  // Load & persist favorites
   useEffect(() => {
     try { const s = localStorage.getItem('arah_favorites'); if (s) setFavorites(new Set(JSON.parse(s))); } catch {}
     setFavsReady(true);
@@ -143,20 +141,31 @@ export default function Storefront() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
-  const addToCart = (id: string) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+  const addToCart = (id: string, maxStock: number) =>
+    setCart((c) => {
+      if ((c[id] || 0) >= maxStock) return c;
+      return { ...c, [id]: (c[id] || 0) + 1 };
+    });
+
   const removeFromCart = (id: string) =>
     setCart((c) => { const n = { ...c }; if (n[id] > 1) n[id]--; else delete n[id]; return n; });
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
+  const favCount  = favorites.size;
 
   const DEFAULT_CATS = ['Grains', 'Legumes', 'Oils & Fats', 'Swallow', 'Seasonings'];
   const dbCats = [...new Set(products.map((p) => p.category).filter(Boolean))];
   const extraCats = dbCats.filter((c) => !DEFAULT_CATS.includes(c));
-  const categories = ['All', ...DEFAULT_CATS, ...extraCats, 'Saved'];
+  const categories = ['All', ...DEFAULT_CATS, ...extraCats, 'Favourite'];
 
-  const visible = activeCat === 'Saved'
+  const visible = activeCat === 'Favourite'
     ? products.filter((p) => favorites.has(p.id))
     : activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
+
+  const goToFavourites = () => {
+    setActiveCat('Favourite');
+    productsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div style={{ background: 'var(--cream)' }}>
@@ -167,8 +176,24 @@ export default function Storefront() {
           <span className="font-display" style={{ fontSize: 28, fontWeight: 600, color: 'white', letterSpacing: '.04em' }}>Arah</span>
           <span className="font-label" style={{ fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600 }}>Provisions</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href="/order" style={{ position: 'relative', color: 'white' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+
+          {/* Favourite icon */}
+          <button
+            onClick={goToFavourites}
+            aria-label="Favourites"
+            style={{ position: 'relative', color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
+          >
+            <HeartIcon filled={favCount > 0} size={20} />
+            {favCount > 0 && (
+              <span style={{ position: 'absolute', top: -8, right: -8, background: '#E53E3E', color: 'white', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {favCount}
+              </span>
+            )}
+          </button>
+
+          {/* Cart icon */}
+          <Link href="/order" style={{ position: 'relative', color: 'white', display: 'flex', alignItems: 'center' }}>
             {CART_SVG}
             {cartCount > 0 && (
               <span style={{ position: 'absolute', top: -8, right: -8, background: '#FBBF24', color: '#000', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -176,6 +201,7 @@ export default function Storefront() {
               </span>
             )}
           </Link>
+
           <Link href="/admin" className="font-label" style={{ color: 'rgba(255,255,255,.6)', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>Admin</Link>
         </div>
       </nav>
@@ -253,84 +279,122 @@ export default function Storefront() {
       </div>
 
       {/* ── PRODUCTS ── */}
-      <div id="products" style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 40px 80px' }}>
+      <div id="products" ref={productsRef} style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 40px 80px' }}>
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 10, height: 280, animation: 'pulse 1.5s ease-in-out infinite', opacity: 0.7 }} />
+              <div key={i} style={{ background: 'white', borderRadius: 6, height: 360, animation: 'pulse 1.5s ease-in-out infinite', opacity: 0.7 }} />
             ))}
           </div>
         ) : (
           <>
+            {/* Category pills */}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
               {categories.map((cat) => (
-                <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}>
+                <button key={cat} className={`filter-pill${activeCat === cat ? ' active' : ''}`} onClick={() => setActiveCat(cat)}
+                  style={cat === 'Favourite' ? { display: 'flex', alignItems: 'center', gap: 5 } : undefined}>
+                  {cat === 'Favourite' && <HeartIcon filled={favCount > 0} size={12} />}
                   {cat}
+                  {cat === 'Favourite' && favCount > 0 && (
+                    <span style={{ background: '#E53E3E', color: 'white', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{favCount}</span>
+                  )}
                 </button>
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="product-grid-responsive">
-              {visible.map((p) => (
-                <div key={p.id} className="card">
-                  <div style={{ height: 200, position: 'relative', overflow: 'hidden', background: 'var(--cream)' }}>
-                    {p.image_url ? (
-                      <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span className="font-display" style={{ fontSize: 48, color: 'var(--gold)' }}>{p.name.charAt(0)}</span>
-                      </div>
-                    )}
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.16) 100%)' }} />
-                    {p.is_featured && (
-                      <span className="font-label" style={{ position: 'absolute', top: 12, left: 12, background: 'var(--green)', color: 'white', fontSize: 8, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 2 }}>
-                        Featured
-                      </span>
-                    )}
-                    {p.stock_quantity < 0 && (
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ color: 'white', fontWeight: 600 }}>Out of Stock</span>
-                      </div>
-                    )}
-                    <button
-                      onClick={() => toggleFavorite(p.id)}
-                      title={favorites.has(p.id) ? 'Remove from saved' : 'Save for later'}
-                      style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,.92)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,.15)', zIndex: 2 }}
-                    >
-                      <HEART_SVG filled={favorites.has(p.id)} />
-                    </button>
-                  </div>
+            {/* Product grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }} className="product-grid-responsive">
+              {visible.map((p) => {
+                const outOfStock = p.stock_quantity <= 0;
+                const lowStock   = !outOfStock && p.stock_quantity < 6;
+                const atCartMax  = (cart[p.id] || 0) >= p.stock_quantity;
 
-                  <div style={{ padding: '18px 20px 20px' }}>
-                    <p className="font-label" style={{ fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6, fontWeight: 600 }}>{p.category}</p>
-                    <h3 className="font-display" style={{ fontSize: 20, fontWeight: 500, marginBottom: 6, color: 'var(--ink)', lineHeight: 1.2, letterSpacing: '.01em' }}>{p.name}</h3>
-                    {p.short_description && (
-                      <p style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 16, fontWeight: 300 }}>{p.short_description}</p>
-                    )}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: p.short_description ? 0 : 16 }}>
-                      <div>
-                        <span className="font-display" style={{ fontWeight: 600, fontSize: 20, color: 'var(--green)', letterSpacing: '.01em' }}>{naira(p.sale_price)}</span>
-                        <span style={{ fontSize: 11, color: 'var(--muted)', marginLeft: 4, fontWeight: 300 }}>/ {p.unit}</span>
-                      </div>
-                      {p.stock_quantity >= 0 && (
-                        <div>
-                          {cart[p.id] ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <button onClick={() => removeFromCart(p.id)} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--green)', background: 'transparent', color: 'var(--green)', fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>−</button>
-                              <span style={{ fontWeight: 600, fontSize: 14, minWidth: 16, textAlign: 'center' }}>{cart[p.id]}</span>
-                              <button onClick={() => addToCart(p.id)} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--green)', background: 'var(--green)', color: 'white', fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>+</button>
-                            </div>
-                          ) : (
-                            <button onClick={() => addToCart(p.id)} className="font-label" style={{ padding: '8px 18px', background: 'var(--green)', color: 'white', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', borderRadius: 2, border: 'none', cursor: 'pointer' }}>
-                              Add
-                            </button>
-                          )}
+                return (
+                  <div key={p.id} className="taeillo-card">
+
+                    {/* ── IMAGE ── */}
+                    <div className="taeillo-img-wrap">
+                      {p.image_url ? (
+                        <img src={p.image_url} alt={p.name} className="taeillo-img" />
+                      ) : (
+                        <div className="taeillo-img-placeholder">
+                          <span className="font-display" style={{ fontSize: 52, color: 'var(--gold)', opacity: .45 }}>{p.name.charAt(0)}</span>
                         </div>
                       )}
+
+                      {/* Out of stock overlay */}
+                      {outOfStock && (
+                        <div className="taeillo-oos-overlay">
+                          <span className="taeillo-oos-badge">Out of Stock</span>
+                        </div>
+                      )}
+
+                      {/* Low stock badge on image */}
+                      {lowStock && (
+                        <span className="taeillo-lowstock-badge">
+                          Only {Math.floor(p.stock_quantity)} left
+                        </span>
+                      )}
+
+                      {/* Featured */}
+                      {p.is_featured && !outOfStock && (
+                        <span className="font-label taeillo-featured-badge">Featured</span>
+                      )}
+
+                      {/* Heart */}
+                      <button
+                        onClick={() => toggleFavorite(p.id)}
+                        title={favorites.has(p.id) ? 'Remove from favourites' : 'Add to favourites'}
+                        className="taeillo-heart-btn"
+                      >
+                        <HeartIcon filled={favorites.has(p.id)} size={15} />
+                      </button>
                     </div>
+
+                    {/* ── INFO ── */}
+                    <div className="taeillo-info">
+                      <p className="taeillo-category">{p.category}</p>
+                      <h3 className="taeillo-name font-display">{p.name}</h3>
+                      {p.short_description && (
+                        <p className="taeillo-desc">{p.short_description}</p>
+                      )}
+
+                      <div className="taeillo-bottom">
+                        <div className="taeillo-price-row">
+                          <span className="font-display taeillo-price">{naira(p.sale_price)}</span>
+                          <span className="taeillo-unit">/ {p.unit}</span>
+                        </div>
+
+                        {outOfStock ? (
+                          <div className="taeillo-oos-label">Out of Stock</div>
+                        ) : cart[p.id] ? (
+                          <div className="taeillo-stepper">
+                            <button onClick={() => removeFromCart(p.id)} className="taeillo-step-btn taeillo-step-minus">−</button>
+                            <span className="taeillo-step-count">{cart[p.id]}</span>
+                            <button
+                              onClick={() => addToCart(p.id, p.stock_quantity)}
+                              disabled={atCartMax}
+                              className={`taeillo-step-btn taeillo-step-plus${atCartMax ? ' disabled' : ''}`}
+                            >+</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => addToCart(p.id, p.stock_quantity)} className="taeillo-add-btn font-label">
+                            Add to Cart
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
                   </div>
+                );
+              })}
+
+              {visible.length === 0 && activeCat === 'Favourite' && (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px 0', color: 'var(--muted)' }}>
+                  <HeartIcon filled={false} size={36} />
+                  <p style={{ marginTop: 16, fontSize: 15, fontWeight: 300 }}>No favourites yet — tap the heart on any product to save it here.</p>
                 </div>
-              ))}
+              )}
             </div>
           </>
         )}
@@ -357,12 +421,258 @@ export default function Storefront() {
       </footer>
 
       <style>{`
+        /* ── Taeillo-inspired product card ── */
+        .taeillo-card {
+          background: #fff;
+          border: 1px solid #EDEAE3;
+          border-radius: 4px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          transition: box-shadow .25s, transform .25s;
+        }
+        .taeillo-card:hover {
+          box-shadow: 0 8px 32px rgba(27,67,50,.12);
+          transform: translateY(-2px);
+        }
+
+        /* image */
+        .taeillo-img-wrap {
+          position: relative;
+          height: 240px;
+          background: #F5F3EE;
+          overflow: hidden;
+        }
+        .taeillo-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform .45s ease;
+        }
+        .taeillo-card:hover .taeillo-img { transform: scale(1.04); }
+        .taeillo-img-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #F5F3EE;
+        }
+
+        /* out of stock overlay */
+        .taeillo-oos-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(255,255,255,.72);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .taeillo-oos-badge {
+          background: #1a1a1a;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: .2em;
+          text-transform: uppercase;
+          padding: 7px 18px;
+          border-radius: 2px;
+          font-family: 'Josefin Sans', sans-serif;
+        }
+
+        /* low stock pill on image */
+        .taeillo-lowstock-badge {
+          position: absolute;
+          bottom: 10px;
+          left: 12px;
+          background: #FEF3C7;
+          color: #92400E;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-family: 'Josefin Sans', sans-serif;
+          border: 1px solid #FCD34D;
+        }
+
+        /* featured badge */
+        .taeillo-featured-badge {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          background: var(--green);
+          color: #fff;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: .16em;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 2px;
+        }
+
+        /* heart */
+        .taeillo-heart-btn {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(255,255,255,.95);
+          border: none;
+          border-radius: 50%;
+          width: 34px;
+          height: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 1px 5px rgba(0,0,0,.14);
+          z-index: 2;
+          transition: transform .15s;
+        }
+        .taeillo-heart-btn:hover { transform: scale(1.12); }
+
+        /* info area */
+        .taeillo-info {
+          padding: 16px 18px 20px;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          gap: 4px;
+        }
+        .taeillo-category {
+          font-size: 9px;
+          letter-spacing: .22em;
+          text-transform: uppercase;
+          color: #9CA3AF;
+          font-weight: 700;
+          font-family: 'Josefin Sans', sans-serif;
+          margin: 0;
+        }
+        .taeillo-name {
+          font-size: 19px;
+          font-weight: 500;
+          color: #111;
+          line-height: 1.22;
+          margin: 0;
+          letter-spacing: .01em;
+        }
+        .taeillo-desc {
+          font-size: 12.5px;
+          color: #6B7280;
+          line-height: 1.58;
+          margin: 4px 0 0;
+          font-weight: 300;
+          flex: 1;
+        }
+
+        /* bottom row */
+        .taeillo-bottom {
+          margin-top: 16px;
+          padding-top: 14px;
+          border-top: 1px solid #F0EEEA;
+        }
+        .taeillo-price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 5px;
+          margin-bottom: 12px;
+        }
+        .taeillo-price {
+          font-weight: 600;
+          font-size: 20px;
+          color: var(--green);
+          letter-spacing: .01em;
+        }
+        .taeillo-unit {
+          font-size: 11px;
+          color: #9CA3AF;
+          font-weight: 300;
+        }
+
+        /* OOS label (in info, below price) */
+        .taeillo-oos-label {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+          color: #9CA3AF;
+          font-family: 'Josefin Sans', sans-serif;
+        }
+
+        /* Add to Cart button */
+        .taeillo-add-btn {
+          width: 100%;
+          padding: 11px 0;
+          background: var(--green);
+          color: #fff;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+          border: none;
+          border-radius: 2px;
+          cursor: pointer;
+          transition: background .18s, opacity .18s;
+        }
+        .taeillo-add-btn:hover { background: #145a32; }
+
+        /* qty stepper */
+        .taeillo-stepper {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          width: 100%;
+          border: 1.5px solid var(--green);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        .taeillo-step-btn {
+          flex: 0 0 40px;
+          height: 38px;
+          background: transparent;
+          border: none;
+          color: var(--green);
+          font-size: 18px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background .15s;
+        }
+        .taeillo-step-btn:hover:not(.disabled) { background: rgba(27,67,50,.07); }
+        .taeillo-step-btn.taeillo-step-plus {
+          background: var(--green);
+          color: #fff;
+        }
+        .taeillo-step-btn.taeillo-step-plus:hover:not(.disabled) { background: #145a32; }
+        .taeillo-step-btn.disabled {
+          opacity: .35;
+          cursor: not-allowed;
+        }
+        .taeillo-step-count {
+          flex: 1;
+          text-align: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--green);
+        }
+
+        /* filter pill overrides */
+        .filter-pill { display: inline-flex; align-items: center; }
+
+        /* responsive */
         @media (max-width: 900px) {
           .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 640px) {
           .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
           .wa-text { display: none; }
+          .taeillo-img-wrap { height: 180px; }
+          .taeillo-name { font-size: 16px; }
+          .taeillo-price { font-size: 17px; }
         }
       `}</style>
     </div>
