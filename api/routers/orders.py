@@ -151,9 +151,12 @@ async def create_order(data: OrderCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(order)
     await db.refresh(invoice)
 
-    # Enqueue invoice task
-    from tasks.invoice_tasks import generate_and_send_invoice
-    generate_and_send_invoice.delay(str(invoice.id))
+    # Enqueue invoice task (best-effort — no-ops when Redis/Celery unavailable)
+    try:
+        from tasks.invoice_tasks import generate_and_send_invoice
+        generate_and_send_invoice.delay(str(invoice.id))
+    except Exception:
+        pass
 
     return _fmt_order(order)
 

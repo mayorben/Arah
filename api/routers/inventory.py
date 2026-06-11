@@ -70,9 +70,12 @@ async def restock(data: RestockIn, db: AsyncSession = Depends(get_db)):
     db.add(movement)
     await db.commit()
 
-    # Notify engaged customers about the restock
-    from tasks.alert_tasks import broadcast_product_update
-    broadcast_product_update.delay(str(prod.id), "restock")
+    # Notify engaged customers about the restock (best-effort)
+    try:
+        from tasks.alert_tasks import broadcast_product_update
+        broadcast_product_update.delay(str(prod.id), "restock")
+    except Exception:
+        pass
 
     return {"product": prod.name, "new_quantity": new_qty}
 
