@@ -82,13 +82,21 @@ const CART_SVG = (
   </svg>
 );
 
+const HEART_SVG = ({ filled }: { filled: boolean }) => (
+  <svg width="16" height="16" fill={filled ? '#E53E3E' : 'none'} stroke={filled ? '#E53E3E' : '#666'} strokeWidth="2" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+  </svg>
+);
+
 export default function Storefront() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [cart, setCart]           = useState<Record<string, number>>({});
-  const [cartReady, setCartReady] = useState(false);
-  const [slide, setSlide]         = useState(0);
-  const [activeCat, setActiveCat] = useState('All');
+  const [products, setProducts]     = useState<Product[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [cart, setCart]             = useState<Record<string, number>>({});
+  const [cartReady, setCartReady]   = useState(false);
+  const [favorites, setFavorites]   = useState<Set<string>>(new Set());
+  const [favsReady, setFavsReady]   = useState(false);
+  const [slide, setSlide]           = useState(0);
+  const [activeCat, setActiveCat]   = useState('All');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
@@ -107,6 +115,18 @@ export default function Storefront() {
   useEffect(() => {
     if (cartReady) localStorage.setItem('arah_cart', JSON.stringify(cart));
   }, [cart, cartReady]);
+
+  // Load & persist favorites
+  useEffect(() => {
+    try { const s = localStorage.getItem('arah_favorites'); if (s) setFavorites(new Set(JSON.parse(s))); } catch {}
+    setFavsReady(true);
+  }, []);
+  useEffect(() => {
+    if (favsReady) localStorage.setItem('arah_favorites', JSON.stringify([...favorites]));
+  }, [favorites, favsReady]);
+
+  const toggleFavorite = (id: string) =>
+    setFavorites((f) => { const n = new Set(f); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   useEffect(() => {
     api.get('/products').then((r) => { setProducts(r.data); setLoading(false); }).catch(() => setLoading(false));
@@ -132,9 +152,11 @@ export default function Storefront() {
   const DEFAULT_CATS = ['Grains', 'Legumes', 'Oils & Fats', 'Swallow', 'Seasonings'];
   const dbCats = [...new Set(products.map((p) => p.category).filter(Boolean))];
   const extraCats = dbCats.filter((c) => !DEFAULT_CATS.includes(c));
-  const categories = ['All', ...DEFAULT_CATS, ...extraCats];
+  const categories = ['All', ...DEFAULT_CATS, ...extraCats, 'Saved'];
 
-  const visible = activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
+  const visible = activeCat === 'Saved'
+    ? products.filter((p) => favorites.has(p.id))
+    : activeCat === 'All' ? products : products.filter((p) => p.category === activeCat);
 
   return (
     <div style={{ background: 'var(--cream)' }}>
@@ -270,6 +292,13 @@ export default function Storefront() {
                         <span style={{ color: 'white', fontWeight: 600 }}>Out of Stock</span>
                       </div>
                     )}
+                    <button
+                      onClick={() => toggleFavorite(p.id)}
+                      title={favorites.has(p.id) ? 'Remove from saved' : 'Save for later'}
+                      style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,.92)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,.15)', zIndex: 2 }}
+                    >
+                      <HEART_SVG filled={favorites.has(p.id)} />
+                    </button>
                   </div>
 
                   <div style={{ padding: '18px 20px 20px' }}>
