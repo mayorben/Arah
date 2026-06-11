@@ -28,14 +28,14 @@ export function PWAInstallPrompt() {
 
     if (ios) {
       setIsIOS(true);
-      const t = setTimeout(() => setVisible(true), 4000);
+      const t = setTimeout(() => setVisible(true), 20000);
       return () => clearTimeout(t);
     }
 
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      const t = setTimeout(() => setVisible(true), 4000);
+      const t = setTimeout(() => setVisible(true), 20000);
       return () => clearTimeout(t);
     };
 
@@ -219,7 +219,7 @@ export function PWAInstallPrompt() {
               {isIOS ? (
                 <>
                   <p className="pwa-eyebrow">Add to Home Screen</p>
-                  <p className="pwa-headline">Your pantry, one tap away.</p>
+                  <p className="pwa-headline">Never run out of stock again.</p>
                   <p className="pwa-sub">
                     Tap <span className="pwa-share-arrow">↑</span> <strong>Share</strong> at the bottom of your browser, then choose <strong>"Add to Home Screen"</strong> for the full app experience.
                   </p>
@@ -232,7 +232,7 @@ export function PWAInstallPrompt() {
               ) : (
                 <>
                   <p className="pwa-eyebrow">Free App Available</p>
-                  <p className="pwa-headline">Never run out again.</p>
+                  <p className="pwa-headline">Never run out of stock again.</p>
                   <p className="pwa-sub">
                     Install Arah on your home screen — <strong>shop in seconds</strong>, get faster load times, and even browse <strong>offline</strong>.
                   </p>
