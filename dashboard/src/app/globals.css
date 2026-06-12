@@ -240,3 +240,18 @@ body {
   .prov-label { padding: 36px 20px 20px; }
   .prov-arrow { width: 36px; height: 36px; }
 }
+
+/* ─── FOOTER ─── */
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 36px !important; }
+}
+@media (max-width: 640px) {
+  .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; padding: 48px 24px 36px !important; }
+  .footer-bottom { padding: 16px 24px !important; flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+}
+
+/* ─── PRODUCT CARD — compact on very small screens ─── */
+@media (max-width: 400px) {
+  .card h3 { font-size: 16px !important; }
+  .card .card-price { font-size: 16px !important; }
+}

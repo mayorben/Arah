@@ -103,8 +103,9 @@ export default function Storefront() {
   const timerRef     = useRef<ReturnType<typeof setInterval> | null>(null);
   const provTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const productsRef  = useRef<HTMLDivElement>(null);
-  const [provSlide, setProvSlide] = useState(0);
-  const [search, setSearch]       = useState('');
+  const [provSlide, setProvSlide]     = useState(0);
+  const [search, setSearch]           = useState('');
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const waNumber = process.env.NEXT_PUBLIC_OWNER_WHATSAPP || '2349074041180';
   const waHref   = `https://wa.me/${waNumber}?text=Hi!%20I%20want%20to%20place%20an%20order.`;
@@ -161,6 +162,14 @@ export default function Storefront() {
     provTimerRef.current = setInterval(() => setProvSlide((s) => (s + 1) % GRID_ITEMS.length), 3800);
     return () => { if (provTimerRef.current) clearInterval(provTimerRef.current); };
   }, []);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const addToCart = (id: string, maxStock: number) =>
     setCart((c) => {
@@ -544,10 +553,90 @@ export default function Storefront() {
         </Link>
       )}
 
+      {/* ── SCROLL TO TOP ── */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          style={{ position: 'fixed', bottom: 100, right: 32, width: 46, height: 46, borderRadius: '50%', background: 'white', border: '1.5px solid var(--border)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 99, boxShadow: '0 4px 16px rgba(0,0,0,.14)', transition: 'opacity .2s, transform .2s' }}
+        >
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      )}
+
       {/* ── FOOTER ── */}
-      <footer style={{ background: 'var(--green)', color: 'white', textAlign: 'center', padding: '40px 24px' }}>
-        <p className="font-display" style={{ fontSize: 28, fontWeight: 500, marginBottom: 8, letterSpacing: '.04em' }}>Arah Provisions</p>
-        <p className="font-label" style={{ fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600 }}>Premium Quality · Honest Prices</p>
+      <footer style={{ background: 'var(--green)', color: 'white' }}>
+        {/* main grid */}
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 40px 48px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }} className="footer-grid">
+
+          {/* Brand */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 14 }}>
+              <span className="font-display" style={{ fontSize: 30, fontWeight: 500, letterSpacing: '.04em' }}>Arah</span>
+              <span className="font-label" style={{ fontSize: 8, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600 }}>Provisions</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.65)', lineHeight: 1.7, fontWeight: 300, marginBottom: 24, maxWidth: 240 }}>
+              Premium Nigerian food provisions — sourced with care, packed with pride. Rice, beans, oils and more delivered to your door.
+            </p>
+            <a href={waHref} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px', background: '#25D366', color: 'white', borderRadius: 999, fontSize: 12, fontWeight: 600, textDecoration: 'none', fontFamily: 'Josefin Sans, sans-serif', letterSpacing: '.08em' }}>
+              {WA_SVG}
+              Chat on WhatsApp
+            </a>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <p className="font-label" style={{ fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600, marginBottom: 20 }}>Quick Links</p>
+            {[
+              { label: 'Shop All Products', onClick: () => { setActiveCat('All'); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); } },
+              { label: 'Grains',            onClick: () => { setActiveCat('Grains'); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); } },
+              { label: 'Legumes',           onClick: () => { setActiveCat('Legumes'); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); } },
+              { label: 'Oils & Fats',       onClick: () => { setActiveCat('Oils & Fats'); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); } },
+              { label: 'Seasonings',        onClick: () => { setActiveCat('Seasonings'); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); } },
+            ].map(({ label, onClick }) => (
+              <button key={label} onClick={onClick} style={{ display: 'block', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,.7)', fontSize: 13, fontWeight: 300, marginBottom: 10, padding: 0, textAlign: 'left', transition: 'color .15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'white')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,.7)')}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Contact & Payment */}
+          <div>
+            <p className="font-label" style={{ fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600, marginBottom: 20 }}>Get in Touch</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.7)', marginBottom: 10, fontWeight: 300 }}>
+              📍 Lagos, Nigeria
+            </p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.7)', marginBottom: 10, fontWeight: 300 }}>
+              📧 hello@arahprovisions.com
+            </p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.7)', marginBottom: 28, fontWeight: 300 }}>
+              📞 +234 801 234 5678
+            </p>
+
+            <p className="font-label" style={{ fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--gold)', fontWeight: 600, marginBottom: 12 }}>We Accept</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {['Visa', 'Mastercard', 'Verve', 'Bank Transfer'].map((m) => (
+                <span key={m} style={{ background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 4, padding: '4px 10px', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,.8)', fontFamily: 'Josefin Sans, sans-serif', letterSpacing: '.04em' }}>{m}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* bottom bar */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,.12)', padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, maxWidth: 1100, margin: '0 auto' }} className="footer-bottom">
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', fontWeight: 300 }}>
+            © {new Date().getFullYear()} Arah Provisions. All rights reserved.
+          </p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', fontWeight: 300 }}>
+            Payments secured by{' '}
+            <span style={{ color: 'var(--gold)', fontWeight: 600 }}>Paystack</span>
+          </p>
+        </div>
       </footer>
 
       <style>{`
@@ -560,9 +649,6 @@ export default function Storefront() {
         @media (max-width: 640px) {
           .product-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
           nav { padding: 14px 16px !important; }
-        }
-        @media (max-width: 400px) {
-          .product-grid-responsive { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
